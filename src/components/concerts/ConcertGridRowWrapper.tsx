@@ -1,26 +1,57 @@
-// src/components/concerts/ConcertGridRowWrapper.tsx (Basic Placeholder)
-import React from 'react';
+// src/components/concerts/ConcertGridRowWrapper.tsx
+import React, { useState, useCallback } from 'react';
+import { ApiConcert } from '@/types';
+import ConcertGridRow from './ConcertGridRow'; // Import the new component
+import ConcertCard from './ConcertCard';     // We'll use this for expanded content
 
-// Define props based on the data structure in page.tsx
 interface ConcertGridRowWrapperProps {
-    concert: any; // Replace 'any' with your actual ApiConcert type later
-    currentViewMode: 'grid' | 'cards';
+  concert: ApiConcert;
+  currentViewMode: 'grid' | 'cards';
+  onPlayRequest: (videoId: string | null) => void;
 }
 
-const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({ concert, currentViewMode }) => {
-  // We will add state for expansion here later
-  const isExpanded = false; 
+const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({ concert, currentViewMode, onPlayRequest }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // TODO: Implement actual Grid Row and Card Content rendering
+  const handleToggleExpand = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  // In Card View mode, we render the full ConcertCard directly.
+  if (currentViewMode === 'cards') {
+    return (
+      <div className="my-4 md:my-6"> {/* Add some margin between cards in card view */}
+        <ConcertCard 
+          concert={concert} 
+          onPlayRequest={onPlayRequest} 
+          isExpandedView={false} // Explicitly false as it's the primary card view
+        />
+      </div>
+    );
+  }
+
+  // In Grid View mode:
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
-       {/* Placeholder for Grid Row content */}
-      <div>Grid Row for: {concert.headliner?.name || 'Unknown Artist'}</div>
+    <div className={`border-b border-neutral-200 dark:border-neutral-700 last:border-b-0 
+                    ${concert.is_featured ? 'bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-800/40' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800'} 
+                    transition-colors duration-150
+                  `}>
+      <ConcertGridRow 
+        concert={concert} 
+        onPlayRequest={onPlayRequest}
+        onToggleExpand={handleToggleExpand}
+        isExpanded={isExpanded}
+      />
       
-      {/* Placeholder for expanded Card Content */}
+      {/* Expanded content area for Grid View */}
       {isExpanded && (
-        <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700">
-          Expanded Card Content Placeholder
+        <div className="p-3 sm:p-4 bg-neutral-50 dark:bg-neutral-850 border-t border-neutral-200 dark:border-neutral-700">
+          {/* Pass isExpandedView={true} to allow for slightly different styling/layout if needed */}
+          <ConcertCard 
+            concert={concert} 
+            onPlayRequest={onPlayRequest}
+            isExpandedView={true} 
+          />
         </div>
       )}
     </div>

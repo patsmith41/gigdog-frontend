@@ -1,10 +1,40 @@
 // src/types/index.ts
 
+export interface ApiConcertHeadliner {
+    // ... existing fields ...
+    openers_string?: string | null; 
+    artist_hometown_from_api?: string | null; // e.g. "Atlanta, GA"
+    genres_array?: string[]; // e.g. ["Metal", "Rock"]
+  }
+  
+  export interface ApiConcertVenue { // Assuming venue full address could come from venue details
+      venue_id: string;
+      name: string;
+      neighborhood_name: string | null;
+      neighborhood_id?: string;
+      venue_full_address_from_api?: string | null; // e.g. "123 Main St, City, ST"
+  }
+  
+
 export interface ApiNeighborhood {
     id: string;
     name: string;
     city: string;
     state: string;
+  }
+  
+  // For GET /api/venues response (if used for "All Venues" filter)
+  export interface ApiVenue {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+  }
+  
+  // For GET /api/genres response (if used for "All Genres" filter)
+  export interface ApiGenre {
+    id: string;
+    name: string;
   }
   
   export interface ApiConcertVenue {
@@ -25,6 +55,10 @@ export interface ApiNeighborhood {
     short_bio: string | null; // From rich_shows_view (artist_short_bio)
     youtube_video_id_1: string | null; // From rich_shows_view (youtube_video_id_1)
     youtube_video_id_2: string | null; // From rich_shows_view (youtube_video_id_2)
+    // --- Fields needed for "ConcertCal" card design, to be added to API/view ---
+    // openers_string?: string | null; // e.g., "w/ Artist B, Artist C"
+    // genres_array?: string[]; // e.g., ["Metal", "Rock"]
+    // hometown_display?: string; // e.g., "Atlanta, GA" - already available via artist_hometown
   }
   
   export interface ApiConcertPriceInfo {
@@ -46,8 +80,10 @@ export interface ApiNeighborhood {
     is_featured: boolean;
     ticket_url: string | null;
     event_info_url: string | null;
-    event_image_url: string | null; // This is show.show_event_image_url from your mapping
-                                     // Note: headliner.image_url also uses a show image (primary_display_image_url) as a primary source.
+    event_image_url: string | null; // This is show.show_event_image_url from your API mapping (original s.event_image_url)
+    // --- Fields needed for "ConcertCal" card design, to be added to API/view ---
+    // venue_full_address?: string | null;
+    // age_restriction_text?: string | null; // e.g., "All Ages", "21+"
   }
   
   // For the full GET /api/shows response structure
