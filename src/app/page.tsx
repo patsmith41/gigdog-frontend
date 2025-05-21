@@ -11,8 +11,8 @@ import {
   ApiNeighborhood,
   ApiShowsResponse,
   NeighborhoodMap,
-  ApiVenue, // For venue filter
-  ApiGenre  // For genre filter
+  ApiFilterVenue, // For venue filter
+  ApiFilterGenre  // For genre filter
 } from '@/types';
 
 // --- Constants ---
@@ -22,8 +22,8 @@ const ITEMS_PER_PAGE = 20; // Or your preferred number
 
 // FiltersBar: Renders horizontal filter dropdowns
 interface FiltersBarProps {
-  genres: ApiGenre[];
-  venues: ApiVenue[];
+  genres: ApiFilterGenre[];
+  venues: ApiFilterVenue[];
   // TODO: Add props for selected date filter values and all filter change handlers
   // onFilterChange: (filterType: string, value: string) => void;
 }
@@ -123,8 +123,8 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'cards'>('grid');
   const [showsData, setShowsData] = useState<ApiShowsResponse | null>(null);
   const [rawNeighborhoods, setRawNeighborhoods] = useState<ApiNeighborhood[]>([]);
-  const [rawVenues, setRawVenues] = useState<ApiVenue[]>([]);
-  const [rawGenres, setRawGenres] = useState<ApiGenre[]>([]);
+  const [rawVenues, setRawVenues] = useState<ApiFilterVenue[]>([]);
+  const [rawGenres, setRawGenres] = useState<ApiFilterGenre[]>([]);
   const [neighborhoodMap, setNeighborhoodMap] = useState<NeighborhoodMap>({});
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
@@ -188,12 +188,12 @@ export default function HomePage() {
       } else { console.error('Failed to fetch neighborhoods'); }
 
       if (venueResponse.ok) {
-        const venueData: ApiVenue[] = await venueResponse.json();
+        const venueData: ApiFilterVenue[] = await venueResponse.json();
         setRawVenues(venueData);
       } else { console.error('Failed to fetch venues'); }
 
       if (genreResponse.ok) {
-        const genreData: ApiGenre[] = await genreResponse.json();
+        const genreData: ApiFilterGenre[] = await genreResponse.json();
         setRawGenres(genreData);
       } else { console.warn('Failed to fetch genres - /api/genres endpoint might be needed.'); }
 

@@ -58,8 +58,7 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onPlayRequest,
   const priceMin = concert.price_info?.min;
   const currency = concert.price_info?.currency || 'USD';
   // Assuming max_price_from_api would be part of price_info if it exists
-  const priceMax = concert.price_info?.max_price_from_api; // Replace with actual field if you add it
-
+  //const priceMax = concert.price_info?.max_price_from_api; // Not using price max right now
   const { dayOfWeek, monthDay } = formatDate(concert.show_date);
   const displayTime = formatTime(concert.show_time);
 
@@ -70,8 +69,7 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onPlayRequest,
   const isHometown = concert.headliner?.is_hometown_show || false;
   const youtubeVideoId1 = concert.headliner?.youtube_video_id_1;
 
-  const priceDisplay = priceMin ? `$${priceMin}${priceMax && priceMin !== priceMax ? `-$${priceMax}` : ''}${currency !== 'USD' ? ` ${currency}` : ''}` : 'N/A';
-
+  const priceDisplay = priceMin ? `$${priceMin}${currency !== 'USD' ? ` ${currency}` : ''}` : 'N/A';
 
   return (
     <div 

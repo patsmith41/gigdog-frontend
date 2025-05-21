@@ -55,20 +55,22 @@ const ConcertCard: React.FC<ConcertCardProps> = ({ concert, onPlayRequest, isExp
   // Placeholder data - these need to come from your API eventually via ApiConcert type
   const headlinerName = concert.headliner.name || "Unknown Artist";
   const openersDisplay = concert.headliner.openers_string || ""; 
-  const artistHometownDisplay = concert.headliner.artist_hometown_from_api || "Hometown TBA"; 
+  const artistHometownDisplay = concert.headliner.hometown || "Hometown TBA"; 
   const venueName = concert.venue.name || "Unknown Venue";
   const neighborhoodName = concert.venue.neighborhood_name || 'N/A';
-  const venueFullAddress = concert.venue.venue_full_address_from_api || "Full Address TBA"; 
-  const genreTags = concert.headliner.genres_array || []; 
-  const ageRestrictionDisplay = concert.age_restriction_text_from_api || "Info TBA"; 
+
+  const venueLocationDisplay = `${concert.venue.neighborhood_name ? concert.venue.neighborhood_name + ' - ' : ''}${concert.venue.city}, ${concert.venue.state}`;
+  //const genreTags = concert.headliner.genres_array || []; 
+  const ageRestrictionDisplay = concert.age_restriction || "Info TBA";
   const shortBio = concert.headliner.short_bio || "No short bio available for this artist.";
   
   const priceMin = concert.price_info?.min;
-  const priceMax = concert.price_info?.max_price_from_api; // Assuming this field in your type
+  //const priceMax = concert.price_info?.max_price_from_api; // Assuming this field in your type
   const currency = concert.price_info?.currency || 'USD';
-  const priceDisplay = priceMin
-    ? `$${priceMin}${priceMax && priceMin !== priceMax ? `-$${priceMax}` : ''}${currency !== 'USD' ? ` ${currency}` : ''}`
-    : "Check Venue";
+  const priceDisplay = concert.price_info?.min
+  ? `$${concert.price_info.min}${concert.price_info.currency !== 'USD' ? ` ${concert.price_info.currency}` : ''}`
+  : "Check Venue";
+  
 
   const headlinerVideoId1 = concert.headliner.youtube_video_id_1;
 
@@ -106,7 +108,9 @@ const ConcertCard: React.FC<ConcertCardProps> = ({ concert, onPlayRequest, isExp
       {/* Right Section: Details */}
       <div className="flex-grow p-4 md:p-5 lg:p-6 flex flex-col justify-between">
         <div> {/* Top part of details */}
-          {genreTags.length > 0 && (
+        
+        {/*
+         {genreTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {genreTags.map((genre, index) => (
                 <span key={index} className="px-2.5 py-1 text-[11px] sm:text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-full font-medium">
@@ -115,6 +119,7 @@ const ConcertCard: React.FC<ConcertCardProps> = ({ concert, onPlayRequest, isExp
               ))}
             </div>
           )}
+              */}
 
           <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-1">
             {headlinerName}
@@ -128,7 +133,7 @@ const ConcertCard: React.FC<ConcertCardProps> = ({ concert, onPlayRequest, isExp
               <div>
                 <p className="font-semibold">{venueName}</p>
                 <p className="text-sm">{neighborhoodName}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{venueFullAddress}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{venueLocationDisplay}</p>
               </div>
             </div>
           </div>
