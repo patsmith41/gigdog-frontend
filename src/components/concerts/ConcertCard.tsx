@@ -57,7 +57,11 @@ const ConcertCard: React.FC<ConcertCardProps> = ({ concert, onPlayRequest, isExp
   const openersDisplay = concert.headliner.openers_string || ""; 
   const artistHometownDisplay = concert.headliner.hometown || "Hometown TBA"; 
   const venueName = concert.venue.name || "Unknown Venue";
-  const neighborhoodName = concert.venue.neighborhood_name || 'N/A';
+  const neighborhoodName = concert.venue?.neighborhood_name || "";
+  const venueCity = concert.venue?.city || "";
+  const venueState = concert.venue?.state || ""; // Still get it from props but not display
+
+
 
   const venueLocationDisplay = `${concert.venue.neighborhood_name ? concert.venue.neighborhood_name + ' - ' : ''}${concert.venue.city}, ${concert.venue.state}`;
   //const genreTags = concert.headliner.genres_array || []; 
