@@ -257,6 +257,7 @@ export default function HomePage() {
   };
 
   return (
+    
     <div className="flex flex-col text-neutral-900 dark:text-neutral-100">
       {/* Section for "Upcoming Shows" title, View Toggle, and Filters Bar */}
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
@@ -266,6 +267,11 @@ export default function HomePage() {
           </h1>
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
         </div>
+        <div className="p-10">
+      <h1 className="text-xxl font-bold bg-yellow-200 text-black">
+        If this isn’t huge, Tailwind config isn’t loading right
+      </h1>
+    </div>
         <FiltersBar
           genres={rawGenres}
           venues={rawVenues}

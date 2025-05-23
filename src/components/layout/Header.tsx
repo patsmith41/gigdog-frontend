@@ -11,8 +11,11 @@ const Header = () => {
         </Link>
         <div>
           {/* Navigation Links Placeholder */}
-          <span className="text-sm text-gray-400">Nav</span>
+          <span className="text-sm text-red-500">Nav</span>
+          <h1 className="text-xxl">Testing XXL</h1>
+
         </div>
+        <div className="p-4 bg-brand-primary text-white my-4"> This should have a custom brand primary background. </div> <div className="p-4 bg-brand-secondary text-black my-4"> This should have a custom brand secondary background. </div>
       </nav>
     </header>
   );
