@@ -1,165 +1,210 @@
 // src/components/concerts/ConcertGridRow.tsx
 import React from 'react';
 import { ApiConcert } from '@/types';
-import { ChevronDown, ChevronUp, PlayCircle, Ticket, MapPin, Music } from 'lucide-react'; // Ensure Music is imported
+import { ChevronDown, ChevronUp, PlayCircleIcon, Ticket, MapPin, Music } from 'lucide-react';
 
-// Helper functions (as you have them)
-const formatDate = (dateString: string): { dayOfWeek: string, monthDay: string } => {
-  if (!dateString) return { dayOfWeek: 'TBA', monthDay: '' }; // Added fallback for invalid dateString
-  const date = new Date(`${dateString}T00:00:00`);
-  const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
-  const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  return { dayOfWeek, monthDay };
-};
-
-const formatTime = (timeString: string | null): string => {
-  if (!timeString) return 'TBA'; // Changed from '' to 'TBA' for clarity
-  const parts = timeString.split(':');
-  if (parts.length < 2 || isNaN(parseInt(parts[0])) || isNaN(parseInt(parts[1]))) {
-    return 'Invalid Time'; // Handle malformed time string
-  }
-  const [hours, minutes] = parts;
-  const date = new Date();
-  date.setHours(parseInt(hours, 10));
-  date.setMinutes(parseInt(minutes, 10));
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+// Helper functions (no changes needed here)
+const formatDateStacked = (dateString: string): { dayShort: string, monthDay: string } => {
+  if (!dateString) return { dayShort: 'TBA', monthDay: '' };
+  try {
+    const date = new Date(parseInt(dateString.split('-')[0]), parseInt(dateString.split('-')[1]) - 1, parseInt(dateString.split('-')[2]));
+    const dayShort = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return { dayShort, monthDay };
+  } catch (e) { return { dayShort: 'ERR', monthDay: 'Date' }; }
 };
 
 interface ConcertGridRowProps {
   concert: ApiConcert;
-  onPlayRequest: (videoId: string) => void;
+  onPlayRequest: (videoId: string | null, artistInfo?: any) => void;
   onToggleExpand: () => void;
-  isExpanded: boolean;
-  isZebraStriped?: boolean; // For alternating row colors (if wrapper handles bg, this might not be needed here)
+  isExpanded: boolean; 
+  isDesktop: boolean; // ADDED: To control mobile UI
 }
 
-const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onPlayRequest, onToggleExpand, isExpanded, isZebraStriped }) => {
-  // Guard clause
-  if (!concert) {
-    console.error("ConcertGridRow: Received undefined or null concert prop.");
-    return <div className="p-4 text-red-500 border-b border-red-300">Error: Invalid concert data passed to row.</div>;
+const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onPlayRequest, onToggleExpand, isExpanded, isDesktop }) => {
+  if (!concert || !concert.headliner || !concert.venue) {
+    return <div className="p-4 text-red-500 border-b border-neutral-700">Error: Missing concert data for row.</div>;
   }
+
+  const { dayShort, monthDay } = formatDateStacked(concert.show_date);
+
+  const imageToUse = concert.headliner.artist_thumbnail_url;
+  const headlinerName = concert.headliner.name;
+  const headlinerVideoId1 = concert.headliner.youtube_video_id_1;
+
+  const openersWithInteractiveLinks = concert.openers_media?.map(opener => ({
+    ...opener,
+    has_video: !!opener.youtube_id_1
+  }));
+
+  const venueName = concert.venue.name;
+  const venueCity = concert.venue.city;
+  const venueState = concert.venue.state;
+
+  const mapQuery = encodeURIComponent(`${venueName}, ${venueCity}, ${venueState}`);
+  const mapLink = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+  const primaryTextColor = "text-white";
+  const secondaryTextColor = "text-neutral-400";
+  const accentColorText = "text-pink-500";
+
+  const handleHeadlinerPlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (headlinerVideoId1) {
+      onPlayRequest(headlinerVideoId1, {
+        artistName: headlinerName,
+        showDate: concert.show_date,
+        venueName: venueName,
+        ticketUrl: concert.ticket_url,
+        showId: concert.show_id
+      });
+    }
+  };
   
-  // ===== START DEBUG LOGS =====
-  console.log(`--------------------------------`);
-  console.log(`ConcertGridRow for show_id: ${concert.show_id}, Artist: ${concert.headliner?.name}`);
-  console.log(`Raw concert.headliner object:`, concert.headliner); 
-  if (concert.headliner) {
-    console.log(`concert.headliner.artist_thumbnail_url (ImageKit):`, concert.headliner.artist_thumbnail_url);
-    console.log(`concert.headliner.image_url (Old raw/combined):`, concert.headliner.image_url); // Log the old one too
-  } else {
-    console.log(`concert.headliner is null or undefined for show_id: ${concert.show_id}`);
-  }
-  // ===== END DEBUG LOGS =====
+  const handleOpenerPlay = (e: React.MouseEvent, openerVideoId: string | null, openerName: string) => {
+    e.stopPropagation();
+    if (openerVideoId) {
+      onPlayRequest(openerVideoId, {
+        artistName: openerName,
+        showDate: concert.show_date,
+        venueName: venueName,
+        ticketUrl: concert.ticket_url,
+        showId: concert.show_id
+      });
+    }
+  };
 
-  // Defensive access for all potentially nullable parent objects
-  const headlinerName = concert.headliner?.name || 'Unknown Artist';
-  const venueName = concert.venue?.name || 'Unknown Venue';
-  const priceMin = concert.price_info?.min;
-  const currency = concert.price_info?.currency || 'USD';
-  // Assuming max_price_from_api would be part of price_info if it exists
-  //const priceMax = concert.price_info?.max_price_from_api; // Not using price max right now
-  const { dayOfWeek, monthDay } = formatDate(concert.show_date);
-  const displayTime = formatTime(concert.show_time);
-
-  // ** USE THE IMAGEKIT THUMBNAIL URL FROM THE HEADLINER OBJECT **
-  const imageToUse = concert.headliner?.artist_thumbnail_url; // THIS IS THE KEY CHANGE
-
-  const openersString = concert.headliner?.openers_string || "";
-  const isHometown = concert.headliner?.is_hometown_show || false;
-  const youtubeVideoId1 = concert.headliner?.youtube_video_id_1;
-
-  const priceDisplay = priceMin ? `$${priceMin}${currency !== 'USD' ? ` ${currency}` : ''}` : 'N/A';
+  const actionButtonBase = "py-2.5 px-4 rounded-xl font-semibold transition-all duration-300 ease flex items-center justify-center gap-2 border text-sm";
+  const ticketButtonStyled = "bg-transparent text-neutral-300 hover:bg-pink-500 hover:text-white border-white hover:border-pink-500";
 
   return (
-    <div 
-      className={`flex items-center gap-3 sm:gap-4 px-3 py-3 sm:px-4 sm:py-4 text-sm relative
-                  ${isZebraStriped ? 'bg-neutral-50 dark:bg-neutral-850' : 'bg-white dark:bg-neutral-900'}
-                  ${concert.is_featured ? 'border-l-4 border-indigo-500' : ''}
-                  ${isExpanded ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}
-                  transition-colors duration-150`}
+    <div
+      className={`
+        flex w-full relative 
+        p-1 md:p-6 lg:p-1
+        bg-neutral-900 border border-white rounded-2xl 
+        transition-all duration-300 ease-in-out
+        hover:bg-neutral-800 hover:-translate-y-1 hover:scale-[1.005] sm:hover:scale-[1.01]
+        hover:shadow-lg hover:border-white
+        ${concert.is_featured ? 'ring-2 ring-yellow-500 ring-offset-2 ring-offset-neutral-900' : ''}
+      `}
     >
-      {isHometown && (
-        <div className="absolute -left-1 top-1/2 -translate-y-1/2 transform -rotate-90 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm shadow-md flex items-center z-10">
-          <MapPin size={10} className="mr-0.5" />
-          LOCAL
+      {concert.headliner.is_hometown_show && (
+        <div className="absolute left-0.5 top-1/2 -translate-y-1/2 transform -rotate-90 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm shadow-md flex items-center z-10 leading-none">
+          <MapPin size={10} className="mr-0.5" />LOCAL
         </div>
       )}
-
-      <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 bg-neutral-200 dark:bg-neutral-700 rounded overflow-hidden">
-        {imageToUse ? ( // Check if imageToUse (ImageKit URL) is truthy
-          <img 
-            src={imageToUse} 
-            alt={`${headlinerName}`} 
-            className="w-full h-full object-cover" 
-            width={64} // Match sm:w-16, adjust if w-12/w-20 is primary
-            height={64}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400 dark:text-neutral-500">
-            <Music size={24} /> {/* Fallback Icon */}
-          </div>
-        )}
-      </div>
-
-      <div className="flex-shrink-0 w-20 sm:w-24 text-center sm:text-left">
-        <div className="font-semibold text-neutral-800 dark:text-neutral-200">{dayOfWeek} {monthDay}</div>
-        <div className="text-neutral-600 dark:text-neutral-400">{displayTime}</div>
-      </div>
-
-      <div className="flex-grow min-w-0">
-        <h3 className="font-bold text-base sm:text-lg text-neutral-900 dark:text-white truncate">
-          {headlinerName}
-        </h3>
-        {openersString && (
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
-            {openersString}
-          </p>
-        )}
-        <p className="text-neutral-700 dark:text-neutral-300 truncate">
-          {venueName}
-        </p>
-      </div>
       
-      <div className="flex-shrink-0 w-20 sm:w-24 text-right font-medium text-neutral-800 dark:text-neutral-200">
-        {priceDisplay}
-      </div>
-
-      <div className="flex-shrink-0 flex items-center gap-1 sm:gap-2">
-        {youtubeVideoId1 && (
-          <button
-            onClick={() => onPlayRequest(youtubeVideoId1)}
-            title="Play Video Preview"
-            className="p-1.5 sm:p-2 text-neutral-600 hover:text-indigo-600 dark:text-neutral-400 dark:hover:text-indigo-400 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
-          >
-            <PlayCircle size={20} />
-            <span className="sr-only">Play Video</span>
-          </button>
-        )}
-
-        {concert.ticket_url && (
-          <a
-            href={concert.ticket_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Get Tickets"
-            className="p-1.5 sm:p-2 text-white bg-red-600 hover:bg-red-700 rounded-md flex items-center gap-1 text-xs sm:text-sm transition-colors"
-          >
-            <Ticket size={16} />
-            <span className="hidden sm:inline">Tickets</span>
-          </a>
-        )}
-
-        <button
-          onClick={onToggleExpand}
-          title={isExpanded ? "Collapse details" : "Expand details"}
-          className="p-1.5 sm:p-2 text-neutral-600 hover:text-indigo-600 dark:text-neutral-400 dark:hover:text-indigo-400 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
-          aria-expanded={isExpanded}
+      <div className="flex w-full items-center gap-3 sm:gap-4 p-2">
+        
+        <div className={`
+            flex-shrink-0 text-center 
+            lg:bg-transparent lg:border lg:border-white lg:rounded-xl lg:p-3 
+            w-[60px] sm:w-[70px] lg:w-[90px]
+            flex flex-col items-center justify-center leading-none
+          `}
         >
-          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-          <span className="sr-only">{isExpanded ? "Collapse" : "Expand"}</span>
-        </button>
+          <p className={`text-xs sm:text-sm font-semibold ${accentColorText} uppercase tracking-wider font-mono`}>{dayShort}</p>
+          <p className={`text-xl sm:text-2xl lg:text-4xl font-bold ${primaryTextColor} my-1`}>{formatDateStacked(concert.show_date).monthDay.split(' ')[1]}</p>
+          <p className={`text-[10px] sm:text-xs ${secondaryTextColor} font-mono`}>{formatDateStacked(concert.show_date).monthDay.split(' ')[0]}</p>
+        </div>
+
+        <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 bg-neutral-700 rounded-2xl overflow-hidden shadow-xl">
+          {imageToUse ? (
+            <img src={imageToUse} alt={`${headlinerName} thumbnail`} className="w-full h-full object-cover" width={112} height={112} loading="lazy" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-500"><Music size={32} /></div>
+          )}
+        </div>
+
+        <div className="flex-grow min-w-0 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 md:gap-4">
+          <div className="min-w-0 flex-1 sm:max-w-[55%] md:max-w-[50%] lg:max-w-[55%]">
+            {/* CHANGED: Logic to show play button */}
+            {headlinerVideoId1 && isDesktop ? ( // Only show play button on desktop
+              <button
+                onClick={handleHeadlinerPlay}
+                className="flex items-baseline gap-1.5 sm:gap-2 text-left group"
+                title={`Play preview for ${headlinerName}`}
+              >
+                <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-semibold ${primaryTextColor} group-hover:text-pink-400 transition-colors leading-tight truncate`} title={headlinerName}>
+                  {headlinerName}
+                </h2>
+                <PlayCircleIcon size={18} strokeWidth={1.5} className={`${secondaryTextColor} group-hover:text-pink-400 transition-colors flex-shrink-0`} />
+              </button>
+            ) : (
+              // On mobile, or if no video, just show the name
+              <h2 className={`text-base sm:text-lg md:text-xl lg:text-2xl font-semibold ${primaryTextColor} leading-tight truncate`} title={headlinerName}>
+                {headlinerName}
+              </h2>
+            )}
+            
+            {openersWithInteractiveLinks && openersWithInteractiveLinks.length > 0 && (
+              <p className={`text-xs sm:text-sm ${secondaryTextColor} mt-0.5 line-clamp-2 hidden sm:block`} title={openersWithInteractiveLinks.map(o => o.name).join(', ')}>
+                w/ {openersWithInteractiveLinks.map((opener, index) => (
+                  <React.Fragment key={opener.name}>
+                    {index > 0 && ', '}
+                    {/* CHANGED: Only show play buttons for openers on desktop */}
+                    {opener.has_video && isDesktop ? (
+                      <button
+                        onClick={(e) => handleOpenerPlay(e, opener.youtube_id_1, opener.name)}
+                        className="hover:underline hover:text-pink-400 transition-colors inline-flex items-center gap-0.5"
+                        title={`Play preview for ${opener.name}`}
+                      >
+                        <span>{opener.name}</span>
+                        <PlayCircleIcon size={12} strokeWidth={1.5} className="text-neutral-400 group-hover:text-pink-400" />
+                      </button>
+                    ) : (
+                      <span>{opener.name}</span>
+                    )}
+                  </React.Fragment>
+                ))}
+              </p>
+            )}
+          </div>
+
+          <div className="flex-shrink-0 min-w-0 mt-1 sm:mt-0">
+            <a
+              href={mapLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm group"
+              title={`Open ${venueName} in Google Maps`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MapPin size={14} className={`flex-shrink-0 text-neutral-400 group-hover:text-pink-400`} />
+              <span className={`font-normal ${secondaryTextColor} group-hover:underline leading-tight truncate max-w-[100px] sm:max-w-[120px] lg:max-w-[150px]`} title={venueName}>
+                {venueName}
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div className="flex flex-shrink-0 items-center gap-2 md:gap-3 ml-auto">
+          {concert.ticket_url && (
+            <a
+              href={concert.ticket_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Get Tickets"
+              className={`${actionButtonBase} ${ticketButtonStyled} hidden lg:flex`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Ticket size={18} />
+              <span className="hidden sm:inline">Tickets</span>
+            </a>
+          )}
+        </div>
       </div>
+
+      <button
+        onClick={onToggleExpand}
+        title={isExpanded ? "Show compact view" : "Show detailed card"}
+        className="absolute bottom-2 right-3 p-1.5 rounded-full text-white hover:text-pink-400 hover:bg-pink-400/10 transition-all duration-200 hover:scale-110"
+      >
+        {isExpanded ? <ChevronUp size={16} strokeWidth={2}/> : <ChevronDown size={16} strokeWidth={2} />}
+        <span className="sr-only">{isExpanded ? "Show compact" : "Show card"}</span>
+      </button>
     </div>
   );
 };

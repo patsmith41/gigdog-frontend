@@ -1,8 +1,7 @@
 /* globals.css */
-@config "../../tailwind.config.js";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../../tailwind.config.js";  
+@import "tailwindcss";    
+
 
 @layer base {
   :root {
@@ -13,15 +12,46 @@
     /* ... your --font-geist-sans etc. ... */
   }
   html.dark {
-    --background-hsl: 0 0% 4%;   /* Dark Mode: Your #0a0a0a */
+    --background-hsl: 0 0% 5%;   /* Dark Mode: Your #0a0a0a */
     --foreground-hsl: 0 0% 93%; /* Dark Mode: Your #ededed */
     /* Potentially different brand HSL values for dark mode if needed */
   }
 
-  /* Remove direct background-color and color from body here */
+  /* Remove direct background-color and color from body here 
   body {
     font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
-    /* Preflight handles basic text color based on light/dark,
+     Preflight handles basic text color based on light/dark,
        but we will apply text-foreground to the body tag in layout.tsx */
+
+    
+  
+}
+
+/* In globals.css */
+
+/* ... your existing styles ... */
+
+/* ADDED: Custom utilities for the curated shelf */
+@layer utilities {
+  .fade-mask-right {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  .fade-mask-left {
+    mask-image: linear-gradient(to left, black 85%, transparent 100%);
+  }
+  .fade-mask-both {
+    mask-image: linear-gradient(to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }

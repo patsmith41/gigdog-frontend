@@ -2,6 +2,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
+import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
   title: 'GigDog - Concert Discovery',
@@ -14,11 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">{/* NO SPACE OR NEWLINE AFTER THIS > */}
+    <html lang="en" className={`${GeistSans.variable} dark`}>{/* NO SPACE OR NEWLINE AFTER THIS > */}
       {/* Next.js will inject <head> content here. Do not add <head> manually unless necessary for specific cases not covered by Metadata API. */}
       <body 
         className={`
-          bg-background text-foreground font-sans 
+          bg-background text-foreground font-sans leading-relaxed {/* <--- ADD leading-normal OR leading-relaxed */}
           flex flex-col min-h-screen 
           selection:bg-indigo-500 selection:text-white
         `}

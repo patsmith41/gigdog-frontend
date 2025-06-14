@@ -1,9 +1,13 @@
-// tailwind.config.js
+// tailwind.config.js - ENSURE THIS IS THE EXACT CONTENT
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   darkMode: 'class',
-  content: [ /* ...your content paths... */ ],
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -13,7 +17,7 @@ module.exports = {
       fontSize: {
         'xxl': '3rem',
       },
-      colors: { // <<< ADD THIS
+      colors: { 
         'background': 'hsl(var(--background-hsl) / <alpha-value>)',
         'foreground': 'hsl(var(--foreground-hsl) / <alpha-value>)',
         'brand-primary': 'hsl(var(--brand-primary-hsl) / <alpha-value>)',
@@ -21,5 +25,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [
+    require('@tailwindcss/forms'),
+    // Make sure line-clamp is NOT here for this revert
+  ],
 };
