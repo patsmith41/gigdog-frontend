@@ -94,3 +94,15 @@ export interface ApiShowsResponse {
 export interface NeighborhoodMap {
   [id: string]: string;
 }
+
+export interface NowPlayingInfo {
+  artistName: string;
+  //videoTitle?: string;    // Optional: e.g., "Primary Preview", "Live at Venue X"
+  showId?: string;        // For linking to a specific show details page (future)
+  showDate?: string;      // For display "Playing at [Venue] on [Date]"
+  venueName?: string;     // For display
+  ticketUrl?: string | null;// For a direct "Get Tickets for this Show" link
+  //hometown?: string | null; // Artist's hometown (primarily for headliner)
+  // You could add artist_id here if you want to fetch more artist details for the sidebar later
+  // artistId?: string;
+}

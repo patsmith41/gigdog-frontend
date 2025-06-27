@@ -1,26 +1,57 @@
-@import "tailwindcss";
+/* globals.css */
+@config "../../tailwind.config.js";  
+@import "tailwindcss";    
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background-hsl: 0 0% 100%; /* Light Mode: White */
+    --foreground-hsl: 0 0% 9%;   /* Light Mode: Your #171717 */
+    --brand-primary-hsl: 217 91% 60%; 
+    --brand-secondary-hsl: 162 74% 45%;
+    /* ... your --font-geist-sans etc. ... */
   }
+  html.dark {
+    --background-hsl: 0 0% 5%;   /* Dark Mode: Your #0a0a0a */
+    --foreground-hsl: 0 0% 93%; /* Dark Mode: Your #ededed */
+    /* Potentially different brand HSL values for dark mode if needed */
+  }
+
+  /* Remove direct background-color and color from body here 
+  body {
+    font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+     Preflight handles basic text color based on light/dark,
+       but we will apply text-foreground to the body tag in layout.tsx */
+
+    
+  
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* In globals.css */
+
+/* ... your existing styles ... */
+
+/* ADDED: Custom utilities for the curated shelf */
+@layer utilities {
+  .fade-mask-right {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  .fade-mask-left {
+    mask-image: linear-gradient(to left, black 85%, transparent 100%);
+  }
+  .fade-mask-both {
+    mask-image: linear-gradient(to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }

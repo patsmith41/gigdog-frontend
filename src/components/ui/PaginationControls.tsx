@@ -30,7 +30,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   };
 
   // Simple page numbers logic (can be made more complex with ellipses)
-  const pageNumbers = [];
+  const pageNumbers: number[] = [];
+;
   const maxPageButtons = 5; // Max number of page buttons to show
 
   if (totalPages <= maxPageButtons) {
