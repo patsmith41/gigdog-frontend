@@ -7,7 +7,7 @@ import CuratedShelf from '@/components/concerts/CuratedShelf';
 import ConcertGridRowWrapper from '@/components/concerts/ConcertGridRowWrapper';
 import PaginationControls from '@/components/ui/PaginationControls';
 import { useDebounce } from '@/hooks/useDebounce';
-import { Search, CalendarDays } from 'lucide-react';
+import { Search } from 'lucide-react';
 import {
   ApiConcert,
   ApiNeighborhood,
@@ -18,17 +18,16 @@ import {
   NowPlayingInfo
 } from '@/types';
 import useMediaQuery from '@/hooks/useMediaQuery';
+import RotatingPromoWidget from '@/components/ui/RotatingPromoWidget'; // --- CHANGE 1: Import the ROTATING widget
 
 const ITEMS_PER_PAGE = 20;
 
-// Filter interface
 interface FilterValues {
   startDate: string;
   endDate: string;
   artistSearch: string;
 }
 
-// Helper function for date formatting
 const formatDateForSidebar = (dateString?: string): string => {
   if (!dateString) return '';
   try {
@@ -39,7 +38,6 @@ const formatDateForSidebar = (dateString?: string): string => {
   } catch (e) { return ''; }
 };
 
-// Simple Filter Bar Component
 interface SimpleFilterBarProps {
   filters: FilterValues;
   onFilterChange: (filterName: keyof FilterValues, value: string) => void;
@@ -55,9 +53,7 @@ const SimpleFilterBar: React.FC<SimpleFilterBarProps> = ({
 }) => {
   return (
     <div id="filter-bar" className="mb-2 md:mb-3">
-      {/* Mobile: Compact, Desktop: Row */}
       <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
-        {/* Artist Search */}
         <div className="flex-1">
           <input 
             type="text" 
@@ -67,8 +63,6 @@ const SimpleFilterBar: React.FC<SimpleFilterBarProps> = ({
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg text-neutral-100 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
           />
         </div>
-
-        {/* Date Range + Clear */}
         <div className="flex gap-2 items-center">
           <input 
             type="date" 
@@ -94,8 +88,6 @@ const SimpleFilterBar: React.FC<SimpleFilterBarProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Result Count - Hidden on mobile, shown on desktop */}
       {resultCount !== undefined && totalCount !== undefined && (
         <div className="hidden md:block mt-1">
           <p className="text-xs text-neutral-500">
@@ -107,79 +99,55 @@ const SimpleFilterBar: React.FC<SimpleFilterBarProps> = ({
   );
 };
 
-// Email Signup Component for Sidebar
 const EmailSignupSection = () => (
-  <div className="p-4 bg-neutral-800 rounded-xl shadow-md mb-6">
-    <h3 className="font-semibold text-neutral-300 mb-3 text-sm">Stay in the Loop</h3>
-    <p className="text-neutral-400 text-xs mb-4">Get weekly Atlanta music updates delivered to your inbox</p>
-    <div className="space-y-3">
-      <input 
-        type="email" 
-        placeholder="Your email address"
-        className="w-full p-2 border border-neutral-600 rounded bg-neutral-700 text-sm text-neutral-100"
-      />
-      <button className="w-full px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded text-sm font-semibold transition-all duration-300">
-        Subscribe
-      </button>
-    </div>
-    <p className="text-neutral-500 text-xs mt-2">No spam, unsubscribe anytime</p>
+    <div className="p-5 bg-neutral-800 rounded-xl shadow-md text-center">
+      <h3 className="font-semibold text-lg text-white mb-1">
+        Weekend Picks, In Your Inbox.
+      </h3>
+      <p className="text-neutral-400 text-sm mb-4">
+        Get our top 3 concert picks delivered every Friday.
+      </p>
+      <form className="flex flex-col sm:flex-row items-center gap-2" onSubmit={(e) => e.preventDefault()}>
+        <input 
+          type="email" 
+          placeholder="your.email@example.com"
+          className="w-full sm:flex-grow min-w-0 p-2 border border-neutral-600 rounded bg-neutral-700 text-sm text-neutral-100 placeholder-neutral-500"
+          aria-label="Email Address"
+        />
+        <button type="submit" className="w-full sm:w-auto flex-shrink-0 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-500 rounded text-sm font-semibold transition-colors duration-300">
+          Sign Up
+        </button>
+      </form>
   </div>
 );
 
-// RightSidebarContent - DESKTOP ONLY video player
+
 interface RightSidebarContentProps {
   activeVideoId: string | null;
   nowPlayingInfo: NowPlayingInfo | null;
 }
+
 const RightSidebarContent: React.FC<RightSidebarContentProps> = ({ activeVideoId, nowPlayingInfo }) => {
-  
   const handleTellFriends = () => {
     if (!nowPlayingInfo) return;
-    
     const message = `Check out ${nowPlayingInfo.artistName} playing at ${nowPlayingInfo.venueName}${nowPlayingInfo.showDate ? ` on ${formatDateForSidebar(nowPlayingInfo.showDate)}` : ''}! 🎵${nowPlayingInfo.ticketUrl ? ` Get tickets: ${nowPlayingInfo.ticketUrl}` : ''}`;
-    
     if (navigator.share) {
-      navigator.share({
-        title: `${nowPlayingInfo.artistName} Live`,
-        text: message,
-        url: nowPlayingInfo.ticketUrl || window.location.href,
-      }).catch((err) => console.log('Share cancelled', err));
+      navigator.share({ title: `${nowPlayingInfo.artistName} Live`, text: message, url: nowPlayingInfo.ticketUrl || window.location.href }).catch(console.log);
     } else {
-      navigator.clipboard.writeText(message).then(() => {
-        alert('Copied to clipboard!');
-      }).catch(() => {
-        const textArea = document.createElement('textarea');
-        textArea.value = message;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert('Copied to clipboard!');
-      });
+      navigator.clipboard.writeText(message).then(() => alert('Copied to clipboard!')).catch(() => { /* Fallback */ });
     }
   };
 
   return (
     <div className="space-y-6 sticky top-20 md:top-24 p-1">
-      <div className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden">
+      
+      <div className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden border border-neutral-700">
         <div className="w-full bg-black flex items-center justify-center text-neutral-500 relative" style={{ aspectRatio: '16/10' }}>
           {activeVideoId ? (
-            <iframe
-              key={activeVideoId}
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1&modestbranding=1&rel=0`}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0"
-            ></iframe>
+            <iframe key={activeVideoId} width="100%" height="100%" src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1&modestbranding=1&rel=0`} title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0"></iframe>
           ) : (
             <div className="flex flex-col items-center justify-center space-y-4 p-8">
-              <div className="w-32 h-32 bg-neutral-700 rounded-full flex items-center justify-center">
-                <p className="text-neutral-400 text-xs text-center">GigDog Logo<br/>Placeholder</p>
-              </div>
+              <div className="w-32 h-32 bg-neutral-700 rounded-full flex items-center justify-center"><p className="text-neutral-400 text-xs text-center">GigDog Logo<br/>Placeholder</p></div>
               <div className="text-center">
                 <p className="text-sm text-neutral-400 mb-2">Click any ▶ button to watch artist previews</p>
                 <p className="text-xs text-neutral-500">Discover new music before you go!</p>
@@ -187,79 +155,41 @@ const RightSidebarContent: React.FC<RightSidebarContentProps> = ({ activeVideoId
             </div>
           )}
         </div>
-      </div>
-      
-      {activeVideoId && nowPlayingInfo && (
-        <div className="bg-neutral-900 rounded-xl shadow-lg p-4 border border-white">
-          <div className="space-y-4">
-            <p className="text-white text-lg leading-relaxed">
-              <span className="font-semibold">{nowPlayingInfo.artistName}</span>
-              {nowPlayingInfo.venueName && (
-                <span className="font-light"> is playing <span className="font-medium">{nowPlayingInfo.venueName}</span></span>
-              )}
-              {nowPlayingInfo.showDate && (
-                <span className="font-light"> on <span className="text-pink-500 font-medium">{formatDateForSidebar(nowPlayingInfo.showDate)}</span></span>
-              )}
-            </p>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={handleTellFriends}
-                className="flex-1 px-4 py-2.5 bg-transparent text-neutral-300 hover:bg-neutral-700 hover:text-white border border-white hover:border-neutral-500 rounded-xl text-sm font-semibold transition-all duration-300 ease"
-              >
-                Tell Friends
-              </button>
-              
-              {nowPlayingInfo.ticketUrl ? (
-                <a 
-                  href={nowPlayingInfo.ticketUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex-1 px-4 py-2.5 bg-pink-500 text-white hover:bg-pink-600 text-center rounded-xl text-sm font-semibold transition-all duration-300 ease"
-                >
-                  Get Tix
-                </a>
-              ) : (
-                <button
-                  disabled
-                  className="flex-1 px-4 py-2.5 bg-neutral-700 text-neutral-500 text-center rounded-xl text-sm font-semibold cursor-not-allowed"
-                >
-                  No Tickets
-                </button>
-              )}
+        
+        {activeVideoId && nowPlayingInfo && (
+          <div className="p-4 border-t border-neutral-700">
+            <div className="space-y-4">
+              <p className="text-white text-lg leading-relaxed">
+                <span className="font-semibold">{nowPlayingInfo.artistName}</span>
+                {nowPlayingInfo.venueName && ( <span className="font-light"> is playing <span className="font-medium">{nowPlayingInfo.venueName}</span></span> )}
+                {nowPlayingInfo.showDate && ( <span className="font-light"> on <span className="text-pink-500 font-medium">{formatDateForSidebar(nowPlayingInfo.showDate)}</span></span> )}
+              </p>
+              <div className="flex gap-3">
+                <button onClick={handleTellFriends} className="flex-1 px-4 py-2.5 bg-transparent text-neutral-300 hover:bg-neutral-700 hover:text-white border border-white hover:border-neutral-500 rounded-xl text-sm font-semibold transition-all duration-300 ease">Tell Friends</button>
+                {nowPlayingInfo.ticketUrl ? (
+                  <a href={nowPlayingInfo.ticketUrl} target="_blank" rel="noopener noreferrer" className="flex-1 px-4 py-2.5 bg-pink-500 text-white hover:bg-pink-600 text-center rounded-xl text-sm font-semibold transition-all duration-300 ease">Get Tix</a>
+                ) : (
+                  <button disabled className="flex-1 px-4 py-2.5 bg-neutral-700 text-neutral-500 text-center rounded-xl text-sm font-semibold cursor-not-allowed">No Tickets</button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      
-      <div>
-        <EmailSignupSection />
+        )}
       </div>
-      
-      {/* This component is now part of the desktop sidebar */}
-      <div className="p-4 bg-neutral-800 rounded-xl shadow-md">
-        <h3 className="font-semibold text-neutral-300 mb-2 text-sm">Featured Artist</h3>
-        <div className="h-16 bg-neutral-700 rounded flex items-center justify-center">
-          <p className="text-neutral-400 text-xs">Artist Info Placeholder</p>
-        </div>
+
+      {/* --- CHANGE 2: The sidebar now has the desired "Promo + Utility" stack --- */}
+      <div className="space-y-6">
+        <RotatingPromoWidget />
+        <EmailSignupSection />
       </div>
     </div>
   );
 };
 
-// ADDED: Created a separate component for this for reusability and clarity
-const FeaturedArtistWidget = () => (
-  <div className="p-4 bg-neutral-800 rounded-xl shadow-md">
-    <h3 className="font-semibold text-neutral-300 mb-2 text-sm">Featured Artist</h3>
-    <div className="h-16 bg-neutral-700 rounded flex items-center justify-center">
-      <p className="text-neutral-400 text-xs">Artist Info Placeholder</p>
-    </div>
-  </div>
-);
-
 
 export default function HomePage() {
   const [showsData, setShowsData] = useState<ApiShowsResponse | null>(null);
+  const [itemsInCardState, setItemsInCardState] = useState<Set<string>>(new Set());
   const [rawNeighborhoods, setRawNeighborhoods] = useState<ApiNeighborhood[]>([]);
   const [rawVenues, setRawVenues] = useState<ApiFilterVenue[]>([]);
   const [rawGenres, setRawGenres] = useState<ApiFilterGenre[]>([]);
@@ -272,23 +202,17 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [itemsInCardState, setItemsInCardState] = useState<Set<string>>(new Set());
 
-  // NEW: Filter state management
   const [filters, setFilters] = useState<FilterValues>({
     startDate: '',
     endDate: '',
     artistSearch: ''
   });
 
-  // Debounce artist search to avoid excessive API calls
   const debouncedArtistSearch = useDebounce(filters.artistSearch, 300);
-
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  // UPDATED: fetchShows function to include filters
   const fetchShows = useCallback(async (page: number) => {
     if (!API_BASE_URL) {
       setError("API URL is not configured."); setIsLoading(false); return;
@@ -300,7 +224,6 @@ export default function HomePage() {
         limit: ITEMS_PER_PAGE.toString() 
       });
 
-      // Add filter parameters to query
       if (filters.startDate) queryParams.set('startDate', filters.startDate);
       if (filters.endDate) queryParams.set('endDate', filters.endDate);
       if (debouncedArtistSearch && debouncedArtistSearch.trim()) {
@@ -332,16 +255,14 @@ export default function HomePage() {
     } catch (err) { console.error("Error fetching filter data:", err); }
   }, [API_BASE_URL]);
 
-  // NEW: Handle filter changes
   const handleFilterChange = useCallback((filterName: keyof FilterValues, value: string) => {
     setFilters(prev => ({
       ...prev,
       [filterName]: value
     }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, []);
 
-  // NEW: Effect to refetch when filters change
   useEffect(() => {
     if (API_BASE_URL) {
       fetchShows(1);
@@ -349,7 +270,7 @@ export default function HomePage() {
   }, [fetchShows, API_BASE_URL]);
 
   useEffect(() => {
-    if (!API_BASE_URL) { setError("API URL not configured."); setIsLoading(false); return; }
+    if (!API_BASE_URL) { setError("API URL is not configured."); setIsLoading(false); return; }
     const loadInitialData = async () => {
       setIsLoading(true); await Promise.all([fetchFilterData(), fetchShows(1)]);
     };
@@ -398,7 +319,6 @@ export default function HomePage() {
     fetchShows(newPage);
     setItemsInCardState(new Set()); 
     setMobileVideoShowId(null);
-    // Scroll to filter bar instead of grid for better UX
     const filterElement = document.getElementById('filter-bar');
     if (filterElement) {
       filterElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -416,12 +336,12 @@ export default function HomePage() {
       return next;
     });
   }, []);
-
+  
   return (
     <div className="flex flex-col">
       <LargerHero />
+      
       <CuratedShelf />
-
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12 -mt-4 md:mt-0">
         <div className="w-full lg:flex-grow min-w-0 order-2 lg:order-1">
           {error && (
@@ -430,7 +350,6 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* NEW: Simple Filter Bar */}
           <SimpleFilterBar 
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -444,55 +363,31 @@ export default function HomePage() {
             <div className="text-center py-20"><p className="text-lg text-neutral-500 dark:text-neutral-400">No shows match criteria.</p></div>
           ) : (
             <>
-              <div
-                id="concert-list-container"
-                className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden border border-neutral-700"
-              >
+              <div id="concert-list-container" className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden border border-neutral-700">
                 {(isLoading && showsData && showsData.shows.length > 0) && <div className="p-4 text-center text-neutral-400">Updating list...</div>}
                 {concertsWithMappedData.map((concert) => (
-                  <ConcertGridRowWrapper
-                    key={concert.show_id}
-                    concert={concert}
-                    onPlayRequest={handlePlayRequest}
-                    isIndividuallyCarded={itemsInCardState.has(concert.show_id)}
-                    onToggleCardState={() => toggleItemCardState(concert.show_id)}
-                    hasActiveVideo={mobileVideoShowId === concert.show_id}
-                    activeVideoId={mobileVideoShowId === concert.show_id ? activeVideoId : null}
-                    nowPlayingInfo={mobileVideoShowId === concert.show_id ? nowPlayingInfo : null}
-                    onCloseVideo={handleCloseMobileVideo}
-                    isDesktop={isDesktop}
-                  />
+                  <ConcertGridRowWrapper key={concert.show_id} concert={concert} onPlayRequest={handlePlayRequest} isIndividuallyCarded={itemsInCardState.has(concert.show_id)} onToggleCardState={() => toggleItemCardState(concert.show_id)}   hasActiveVideo={mobileVideoShowId === concert.show_id}
+                  activeVideoId={mobileVideoShowId === concert.show_id ? activeVideoId : null}
+                  nowPlayingInfo={mobileVideoShowId === concert.show_id ? nowPlayingInfo : null}
+                  onCloseVideo={handleCloseMobileVideo} isDesktop={isDesktop} />
                 ))}
               </div>
               {(showsData && showsData.totalCount > ITEMS_PER_PAGE) && (
-                <PaginationControls
-                  currentPage={currentPage}
-                  totalPages={Math.ceil(showsData.totalCount / ITEMS_PER_PAGE)}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationControls currentPage={currentPage} totalPages={Math.ceil(showsData.totalCount / ITEMS_PER_PAGE)} onPageChange={handlePageChange} />
               )}
             </>
           )}
-
-          {/* --- SECTION CHANGED --- */}
-          {/* This widget is now placed at the bottom of the main content column */}
-          {/* It is hidden on large screens and up (lg:hidden) because it exists in the sidebar there */}
-          <div className="mt-8 lg:hidden">
-            <FeaturedArtistWidget />
+          
+          {/* --- CHANGE 3: The mobile layout now correctly shows the rotator + email signup --- */}
+          <div className="mt-8 lg:hidden space-y-6">
+            <RotatingPromoWidget />
+            <EmailSignupSection />
           </div>
-          {/* --- END OF SECTION CHANGE --- */}
-
         </div>
-
         <aside className="w-full lg:w-[400px] xl:w-[480px] flex-shrink-0 order-1 lg:order-2">
           {isDesktop && (
-            <RightSidebarContent 
-              activeVideoId={activeVideoId}
-              nowPlayingInfo={nowPlayingInfo}
-            />
+            <RightSidebarContent activeVideoId={activeVideoId} nowPlayingInfo={nowPlayingInfo} />
           )}
-          {/* REMOVED: The mobile version of the Featured Artist widget is no longer needed here */}
-          {/* It has been moved to the bottom of the main column */}
         </aside>
       </div>
     </div>

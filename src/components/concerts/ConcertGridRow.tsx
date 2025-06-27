@@ -91,7 +91,7 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onPlayRequest,
       `}
     >
       {concert.headliner.is_hometown_show && (
-        <div className="absolute left-0.5 top-1/2 -translate-y-1/2 transform -rotate-90 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm shadow-md flex items-center z-10 leading-none">
+        <div className="absolute top-2 right-2 bg-green-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm shadow-md flex items-center z-10 leading-none">
           <MapPin size={10} className="mr-0.5" />LOCAL
         </div>
       )}

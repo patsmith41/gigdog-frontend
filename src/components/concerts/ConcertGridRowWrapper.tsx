@@ -3,19 +3,15 @@ import React from 'react';
 import { ApiConcert, NowPlayingInfo } from '@/types';
 import ConcertGridRow from './ConcertGridRow';
 import ConcertCard from './ConcertCard';
-// REMOVED: No longer need InlineVideoPlayer here
 
 interface ConcertGridRowWrapperProps {
   concert: ApiConcert;
   onPlayRequest: (videoId: string | null, artistInfo?: any) => void;
   isIndividuallyCarded: boolean;
   onToggleCardState: () => void;
-  // REMOVED: Mobile-specific props are no longer needed here
-  // hasActiveVideo?: boolean;
   activeVideoId?: string | null;
-  // nowPlayingInfo?: NowPlayingInfo | null;
-  // onCloseVideo?: () => void;
   isDesktop: boolean;
+  context?: 'homepage' | 'festival'; // ADD: Accept context prop
 }
 
 const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({
@@ -23,8 +19,9 @@ const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({
   onPlayRequest,
   isIndividuallyCarded,
   onToggleCardState,
-  activeVideoId = null, // We still receive this
-  isDesktop
+  activeVideoId = null,
+  isDesktop,
+  context = 'homepage' // ADD: Default context
 }) => {
 
   if (isIndividuallyCarded) {
@@ -35,9 +32,9 @@ const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({
           onPlayRequest={onPlayRequest}
           onCollapse={onToggleCardState}
           isIndividuallyToggled={true}
-          // CHANGED: The card now determines if its video is active
           activeVideoId={activeVideoId}
           isDesktop={isDesktop}
+          context={context} // ADD: Pass through context prop
         />
       </div>
     );
