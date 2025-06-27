@@ -10,7 +10,7 @@ const LargerHero: React.FC = () => {
 
   return (
     <section 
-      className="w-full py-8 md:py-12 bg-neutral-900 text-center relative overflow-hidden bg-cover mb-8 md:mb-12"
+      className="w-full py-12 md:py-22 bg-neutral-900 text-center relative overflow-hidden bg-cover mb-8 md:mb-12"
       style={{ 
         backgroundImage: `url(${heroBackgroundImageUrl})`,
         backgroundPosition: 'center 49%', 

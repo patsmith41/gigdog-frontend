@@ -106,3 +106,18 @@ export interface NowPlayingInfo {
   // You could add artist_id here if you want to fetch more artist details for the sidebar later
   // artistId?: string;
 }
+
+// ADD THIS NEW TYPE for the festival artist data
+export interface FestivalArtist extends ApiConcert {
+  day_playing: string | null;
+}
+
+// ADD THIS NEW TYPE for the overall festival page data
+export interface FestivalPageData {
+  name: string;
+  year: number;
+  heroImageUrl: string;
+  dates: string;
+  location: string;
+  lineup: FestivalArtist[];
+}

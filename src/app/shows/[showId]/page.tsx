@@ -10,7 +10,8 @@ import { ArtistDetailCard } from '@/components/shows/ArtistDetailCard';
 interface ShowDetailData {
   show_id: string; show_date: string; show_time: string | null; doors_time: string | null;
   age_restriction: string | null; ticket_url: string | null; price_info: { min: number | null };
-  venue: { name: string; address: string | null; city: string; state: string; website: string | null; };
+  venue: { name: string; address: string | null; city: string; state: string; website: string | null; google_place_id: string | null;  latitude: number | null;      // <-- ADD THIS LINE
+  longitude: number | null; };
   artists: Array<{
     artist_id: string; name: string; image_url: string | null; is_hometown_show: boolean;
     hometown: string | null; is_headliner: boolean; long_bio: string | null; 
@@ -159,34 +160,37 @@ export default function ShowDetailPage() {
         </div>
         
         <header className="py-10 md:py-16 border-b-2 border-neutral-800">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter">
-                {headliner?.name}
-              </h1>
-              {openers.length > 0 && (
-                <p className="text-xl md:text-2xl text-neutral-400 mt-2">
-                  with {openers.map(o => o.name).join(', ')}
-                </p>
-              )}
-              <div className="mt-4 text-lg text-neutral-300">
-                <p>
-                  <span>{formatDateForShow(showData.show_date)}</span>
-                  <span className="mx-2 text-neutral-600">•</span>
-                  <span>at {showData.venue.name}</span>
-                </p>
-              </div>
-            </div>
-            
-            {showData.ticket_url && (
-              <div className="flex-shrink-0 text-center md:text-right">
-                <a href={showData.ticket_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors shadow-lg">
-                  <Ticket size={22} /> Buy Tickets
-                </a>
-              </div>
-            )}
-          </div>
-        </header>
+  {/* The main container is now a simple vertical stack on all screen sizes */}
+  <div className="flex flex-col gap-8">
+    {/* This single div now holds both the text and the button */}
+    <div className="text-center md:text-left">
+      <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter">
+        {headliner?.name}
+      </h1>
+      {openers.length > 0 && (
+        <p className="text-xl md:text-2xl text-neutral-400 mt-2">
+          with {openers.map(o => o.name).join(', ')}
+        </p>
+      )}
+      <div className="mt-4 text-lg text-neutral-300">
+        <p>
+          <span>{formatDateForShow(showData.show_date)}</span>
+          <span className="mx-2 text-neutral-600">•</span>
+          <span>at {showData.venue.name}</span>
+        </p>
+      </div>
+
+      {/* The "Buy Tickets" button is now here, with a top margin for spacing */}
+      {showData.ticket_url && (
+        <div className="mt-8">
+          <a href={showData.ticket_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors shadow-lg">
+            <Ticket size={22} /> Buy Tickets
+          </a>
+        </div>
+      )}
+    </div>
+  </div>
+</header>
 
         <main className="mt-8">
             <h2 className="text-sm font-bold uppercase tracking-widest text-neutral-500 border-b border-neutral-800 pb-2 mb-4">Full Lineup</h2>
@@ -200,32 +204,69 @@ export default function ShowDetailPage() {
         </main>
         
         <footer className="py-16 mt-8 border-t border-neutral-800">
-             <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold">Venue: {showData.venue.name}</h3>
-                  <div className="flex items-start gap-3">
-                    <MapPin size={20} className="text-neutral-400 mt-1" />
-                    <div>
-                      <p>{showData.venue.address}, {showData.venue.city}, {showData.venue.state}</p>
-                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${showData.venue.name} ${showData.venue.address || ''}`)}`} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Get Directions</a>
-                    </div>
-                  </div>
-                   {showData.venue.website && (
-                     <div className="flex items-center gap-3">
-                       <Globe size={20} className="text-neutral-400" />
-                       <a href={showData.venue.website} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">Visit Website</a>
-                     </div>
-                   )}
-                </div>
-                <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                   <iframe
-                     title={`Street View of ${showData.venue.name}`}
-                     src={`https://www.google.com/maps/embed/v1/streetview?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&location=${encodeURIComponent(`${showData.venue.address || ''}, ${showData.venue.city}, ${showData.venue.state}`)}`}
-                     width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy"
-                   ></iframe>
-                </div>
-             </div>
-        </footer>
+  <div className="space-y-4 mb-8">
+    <h2 className="text-3xl font-bold">Venue: {showData.venue.name}</h2>
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-neutral-300">
+      <div className="flex items-center gap-3">
+        <MapPin size={20} className="text-neutral-400" />
+        <div>
+          <p>{showData.venue.address}, {showData.venue.city}, {showData.venue.state}</p>
+        </div>
+      </div>
+      {showData.venue.website && (
+        <div className="flex items-center gap-3">
+          <Globe size={20} className="text-neutral-400" />
+          <a href={showData.venue.website} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+            Visit Website
+          </a>
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* --- NEW: Two-in-One Map & Street View Container --- */}
+  <div className="flex flex-col md:flex-row gap-2 w-full h-[500px] md:h-96">
+    
+    {/* Street View Pane (Left side on desktop, top on mobile) */}
+    <div className="w-full md:w-3/5 h-1/2 md:h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
+      {(showData.venue.latitude && showData.venue.longitude) ? (
+        <iframe
+          title={`Street View of ${showData.venue.name}`}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          loading="lazy"
+          allowFullScreen
+          src={`https://www.google.com/maps/embed/v1/streetview?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&location=${showData.venue.latitude},${showData.venue.longitude}`}
+        ></iframe>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-neutral-500">
+          <p>Street View not available</p>
+        </div>
+      )}
+    </div>
+
+    {/* Map Pane (Right side on desktop, bottom on mobile) */}
+    <div className="w-full md:w-2/5 h-1/2 md:h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
+      {showData.venue.google_place_id ? (
+        <iframe
+          title={`Map of ${showData.venue.name}`}
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          loading="lazy"
+          allowFullScreen
+          src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=place_id:${showData.venue.google_place_id}`}
+        ></iframe>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-neutral-500">
+          <p>Map not available</p>
+        </div>
+      )}
+    </div>
+
+  </div>
+</footer>
       </div>
     </div>
   );
