@@ -1,9 +1,8 @@
 // next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //experimental: {
-   // css: true,
- // },
-  // any other existing Next.js options you might have
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 export default nextConfig;

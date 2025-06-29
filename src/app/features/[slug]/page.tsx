@@ -20,7 +20,14 @@ async function getArticleData(slug: string) {
   return null;
 }
 
-export default async function BlogArticlePage({ params }: { params: { slug: string } }) {
+interface ArticlePageProps {
+  params: {
+    slug: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function BlogArticlePage({ params }: ArticlePageProps) {
   const articleData = await getArticleData(params.slug);
 
   if (!articleData) {
