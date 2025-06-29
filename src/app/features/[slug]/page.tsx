@@ -18,14 +18,16 @@ async function getArticleData(slug: string) {
 export default async function BlogArticlePage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const articleData = await getArticleData(params.slug);
-
+  // Await the params before using them
+  const resolvedParams = await params;
+  const articleData = await getArticleData(resolvedParams.slug);
+  
   if (!articleData) {
     return <div>Article not found.</div>;
   }
-
+  
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-white mb-4">{articleData.headline}</h1>
