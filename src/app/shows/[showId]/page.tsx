@@ -204,69 +204,72 @@ export default function ShowDetailPage() {
         </main>
         
         <footer className="py-16 mt-8 border-t border-neutral-800">
-  <div className="space-y-4 mb-8">
-    <h2 className="text-3xl font-bold">Venue: {showData.venue.name}</h2>
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-neutral-300">
-      <div className="flex items-center gap-3">
-        <MapPin size={20} className="text-neutral-400" />
-        <div>
-          <p>{showData.venue.address}, {showData.venue.city}, {showData.venue.state}</p>
-        </div>
-      </div>
-      {showData.venue.website && (
-        <div className="flex items-center gap-3">
-          <Globe size={20} className="text-neutral-400" />
-          <a href={showData.venue.website} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
-            Visit Website
-          </a>
-        </div>
-      )}
-    </div>
-  </div>
+          <div className="space-y-4 mb-8">
+            <h2 className="text-3xl font-bold">Venue: {showData.venue.name}</h2>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-neutral-300">
+              <div className="flex items-center gap-3">
+                <MapPin size={20} className="text-neutral-400" />
+                <div>
+                  <p>{showData.venue.address}, {showData.venue.city}, {showData.venue.state}</p>
+                </div>
+              </div>
+              {showData.venue.website && (
+                <div className="flex items-center gap-3">
+                  <Globe size={20} className="text-neutral-400" />
+                  <a href={showData.venue.website} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+                    Visit Website
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
 
-  {/* --- NEW: Two-in-One Map & Street View Container --- */}
-  <div className="flex flex-col md:flex-row gap-2 w-full h-[500px] md:h-96">
-    
-    {/* Street View Pane (Left side on desktop, top on mobile) */}
-    <div className="w-full md:w-3/5 h-1/2 md:h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
-      {(showData.venue.latitude && showData.venue.longitude) ? (
-        <iframe
-          title={`Street View of ${showData.venue.name}`}
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://www.google.com/maps/embed/v1/streetview?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&location=${showData.venue.latitude},${showData.venue.longitude}`}
-        ></iframe>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-neutral-500">
-          <p>Street View not available</p>
-        </div>
-      )}
-    </div>
+          {/* --- UPDATED: Map-Only Container --- */}
+          <div className="flex flex-col md:flex-row gap-2 w-full h-[500px] md:h-96">
+            
+            {/* 
+              Street View Pane (Temporarily Removed)
+              
+              <div className="w-full md:w-3/5 h-1/2 md:h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
+                {(showData.venue.latitude && showData.venue.longitude) ? (
+                  <iframe
+                    title={`Street View of ${showData.venue.name}`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                    src={`https://www.google.com/maps/embed/v1/streetview?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&location=${showData.venue.latitude},${showData.venue.longitude}`}
+                  ></iframe>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-neutral-500">
+                    <p>Street View not available</p>
+                  </div>
+                )}
+              </div> 
+            */}
 
-    {/* Map Pane (Right side on desktop, bottom on mobile) */}
-    <div className="w-full md:w-2/5 h-1/2 md:h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
-      {showData.venue.google_place_id ? (
-        <iframe
-          title={`Map of ${showData.venue.name}`}
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=place_id:${showData.venue.google_place_id}`}
-        ></iframe>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-neutral-500">
-          <p>Map not available</p>
-        </div>
-      )}
-    </div>
+            {/* Map Pane (Now takes up the full width) */}
+            <div className="w-full h-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700">
+              {showData.venue.google_place_id ? (
+                <iframe
+                  title={`Map of ${showData.venue.name}`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=place_id:${showData.venue.google_place_id}`}
+                ></iframe>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-neutral-500">
+                  <p>Map not available</p>
+                </div>
+              )}
+            </div>
 
-  </div>
-</footer>
+          </div>
+        </footer>
       </div>
     </div>
   );

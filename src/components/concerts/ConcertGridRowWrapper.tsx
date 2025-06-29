@@ -11,6 +11,10 @@ interface ConcertGridRowWrapperProps {
   onToggleCardState: () => void;
   activeVideoId?: string | null;
   isDesktop: boolean;
+  hasActiveVideo?: boolean;
+  
+  nowPlayingInfo?: NowPlayingInfo | null;
+  onCloseVideo?: () => void;
   context?: 'homepage' | 'festival'; // ADD: Accept context prop
 }
 

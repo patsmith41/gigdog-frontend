@@ -57,7 +57,7 @@ const SimpleFilterBar: React.FC<SimpleFilterBarProps> = ({
         <div className="flex-1">
           <input 
             type="text" 
-            placeholder="Search artists..." 
+            placeholder="Search artists or venues..." 
             value={filters.artistSearch}
             onChange={(e) => onFilterChange('artistSearch', e.target.value)}
             className="w-full px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg text-neutral-100 text-sm placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
@@ -341,7 +341,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       <LargerHero />
       
-      <CuratedShelf />
+      {/*<CuratedShelf />*/}
       <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12 -mt-4 md:mt-0">
         <div className="w-full lg:flex-grow min-w-0 order-2 lg:order-1">
           {error && (
