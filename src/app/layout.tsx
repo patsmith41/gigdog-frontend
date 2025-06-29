@@ -2,6 +2,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function RootLayout({
       >{/* NO SPACE OR NEWLINE AFTER THIS > */}
         <Header />
         <main className="flex-grow w-full">{children}</main>
-        {/* <Footer /> */}
+        <Footer /> 
       </body>{/* NO SPACE OR NEWLINE BEFORE THIS < */}
     </html>// NO SPACE OR NEWLINE AFTER THIS ;
   );
