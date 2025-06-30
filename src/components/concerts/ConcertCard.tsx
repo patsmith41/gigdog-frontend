@@ -278,7 +278,7 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
         </div>
 
         {/* The simple text link for Spotify, only for the festival context */}
-        {context === 'festival' && concert.headliner.spotify_url && (
+        {/*{context === 'festival' && concert.headliner.spotify_url && (
             <div className="mt-4 text-center">
                 <a 
                     href={concert.headliner.spotify_url}
@@ -290,6 +290,7 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
                 </a>
             </div>
         )}
+        */}
       </div>
     </div>
   );
