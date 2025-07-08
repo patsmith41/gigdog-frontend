@@ -16,20 +16,7 @@
     --foreground-hsl: 0 0% 93%; /* Dark Mode: Your #ededed */
     /* Potentially different brand HSL values for dark mode if needed */
   }
-
-  /* Remove direct background-color and color from body here 
-  body {
-    font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
-     Preflight handles basic text color based on light/dark,
-       but we will apply text-foreground to the body tag in layout.tsx */
-
-    
-  
 }
-
-/* In globals.css */
-
-/* ... your existing styles ... */
 
 /* ADDED: Custom utilities for the curated shelf */
 @layer utilities {
@@ -54,6 +41,25 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out forwards;
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }
 
-
+/* --- FIX IS HERE --- */
+/* This is now its own separate layer, not nested */
+@layer components {
+  .yt-iframe {
+    @apply w-full h-full;
+  }
+}

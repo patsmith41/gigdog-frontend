@@ -1,6 +1,13 @@
 // src/app/contact/page.tsx
 import type { Metadata } from 'next';
-import { MessageSquare, Music, Megaphone, Instagram, Twitter } from 'lucide-react';
+import { MessageSquare, Music, Megaphone, Instagram } from 'lucide-react';
+
+// A simple, reusable TikTok icon component
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.05-4.85-.38-6.75-1.77-1.26-.91-2.2-2.14-2.73-3.56s-.76-2.99-.76-4.5v-4.04c.57.02 1.14-.02 1.71-.02.02 4.73.01 9.46-.02 14.19.03 2.02 1.88 3.64 3.89 3.66 2.03.02 3.8-.87 4.54-2.82.09-.24.13-.5.17-.76.01-4.26.01-8.52.01-12.78-.01-.6-.11-1.19-.24-1.77-1.11-5.11-5.71-8.59-10.95-8.59-.01.02-.02.01-.02.01H.01V4.23c1.38.01 2.75-.04 4.13.02 1.13.05 2.25.32 3.3.76.6.26 1.18.59 1.72.98.09-2.2.03-4.4-.04-6.6z" />
+    </svg>
+);
 
 export const metadata: Metadata = {
   title: 'Contact GigDog',
@@ -33,7 +40,7 @@ const ContactPage = () => {
                 <h3 className="text-xl font-semibold">General Feedback & Support</h3>
               </div>
               <p className="text-neutral-400 mb-4">
-                Found a bug? Have a feature idea? Let us know what's on your mind.
+                Let us know what's on your mind.
               </p>
               <a href="mailto:hello@gigdog.live" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
                 hello@gigdog.live
@@ -56,33 +63,31 @@ const ContactPage = () => {
             <div className="bg-neutral-900 p-6 rounded-lg border border-neutral-800">
               <div className="flex items-center gap-4 mb-3">
                 <Megaphone size={24} className="text-yellow-400" />
-                <h3 className="text-xl font-semibold">Press & Partnerships</h3>
+                <h3 className="text-xl font-semibold">Artist Profiles</h3>
               </div>
               <p className="text-neutral-400 mb-4">
-                Interested in working with us or featuring GigDog? We're all ears.
+                Need to add or make changes to your bio/photos/videos?
               </p>
-              <a href="mailto:press@gigdog.live" className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors">
-                press@gigdog.live
+              <a href="mailto:bio@gigdog.live" className="font-semibold text-yellow-400 hover:text-yellow-300 transition-colors">
+                bio@gigdog.live
               </a>
             </div>
           </div>
 
           {/* Social Media */}
           <div className="bg-neutral-900 p-6 rounded-lg border border-neutral-800 flex flex-col">
-            <h3 className="text-xl font-semibold mb-6">Find Us On Social</h3>
+            <h3 className="text-xl font-semibold mb-6">Find Us On Socials</h3>
             <div className="space-y-4">
-                <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group p-4 rounded-lg hover:bg-neutral-800 transition-colors">
-                    <Instagram className="w-8 h-8 text-neutral-500 group-hover:text-pink-500 transition-colors" />
+            <a href="https://www.instagram.com/gigdog_atl/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group p-3 rounded-lg hover:bg-neutral-800 transition-colors">
                     <div>
                         <p className="font-semibold text-white">Instagram</p>
-                        <p className="text-sm text-neutral-400">@GigDogATL</p>
+                        <p className="text-sm text-neutral-400">@GigDog_atl</p>
                     </div>
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group p-4 rounded-lg hover:bg-neutral-800 transition-colors">
-                    <Twitter className="w-8 h-8 text-neutral-500 group-hover:text-sky-400 transition-colors" />
+                <a href="https://www.tiktok.com/@gig_dog_atl" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group p-3 rounded-lg hover:bg-neutral-800 transition-colors">
                     <div>
-                        <p className="font-semibold text-white">Twitter / X</p>
-                        <p className="text-sm text-neutral-400">@GigDogATL</p>
+                        <p className="font-semibold text-white">TikTok</p>
+                        <p className="text-sm text-neutral-400">@GigDog_atl</p>
                     </div>
                 </a>
             </div>
