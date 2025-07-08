@@ -93,9 +93,11 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
     }
   };
 
-  const currentArtistImage = 'artist_display_image_url' in activeArtist 
-    ? activeArtist.artist_display_image_url 
-    : ('artist_thumbnail_url' in activeArtist && activeArtist.artist_thumbnail_url) || null;
+  const currentArtistImage = 'artist_display_image_url' in activeArtist && activeArtist.artist_display_image_url
+  ? activeArtist.artist_display_image_url 
+  : ('artist_thumbnail_url' in activeArtist && activeArtist.artist_thumbnail_url) 
+  ? activeArtist.artist_thumbnail_url
+  : undefined;
 
   const showDateFormatted = new Date(show.show_date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
