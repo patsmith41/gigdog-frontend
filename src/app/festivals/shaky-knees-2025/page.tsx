@@ -8,7 +8,7 @@ import { ApiConcert, NowPlayingInfo, FestivalPageData } from '@/types';
 // Reusable components
 import CuratedShelf from '@/components/concerts/CuratedShelf';
 import ConcertGridRowWrapper from '@/components/concerts/ConcertGridRowWrapper';
-import RotatingPromoWidget from '@/components/ui/RotatingPromoWidget'; // --- CHANGE 1: Import the rotating widget
+import RotatingPromoWidget from '@/components/ui/RotatingPromoWidget';
 
 interface FestivalHeroProps {
   name: string;
@@ -29,7 +29,6 @@ const FestivalHero: React.FC<FestivalHeroProps> = ({ name, dates, location, hero
     </section>
 );
 
-// --- CHANGE 2: Add the redesigned, compact EmailSignupSection component ---
 const EmailSignupSection = () => (
     <div className="p-5 bg-neutral-800 rounded-xl shadow-md text-center">
       <h3 className="font-semibold text-lg text-white mb-1">
@@ -59,7 +58,6 @@ interface FestivalSidebarProps {
 }
 
 const FestivalSidebar: React.FC<FestivalSidebarProps> = ({ activeVideoId, nowPlayingInfo }) => {
-    // --- CHANGE 3: The entire layout of the sidebar is refactored here ---
     return (
         <div className="space-y-6 sticky top-20 md:top-24 p-1">
           
@@ -111,7 +109,7 @@ const FestivalSidebar: React.FC<FestivalSidebarProps> = ({ activeVideoId, nowPla
 };
 
 
-// --- Main Page Component (logic remains the same) ---
+// --- Main Page Component ---
 export default function ShakyKneesPage() {
   const [festivalData, setFestivalData] = useState<FestivalPageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -157,11 +155,14 @@ export default function ShakyKneesPage() {
     return artist.day_playing === activeDay;
   }) || [];
 
-  const toggleItemCardState = useCallback((showId: string) => {
+  const handleShowSelect = useCallback((showId: string) => {
     setItemsInCardState(prev => {
       const next = new Set(prev);
-      if (next.has(showId)) next.delete(showId);
-      else next.add(showId);
+      if (next.has(showId)) {
+        next.delete(showId);
+      } else {
+        next.add(showId);
+      }
       return next;
     });
   }, []);
@@ -231,11 +232,12 @@ export default function ShakyKneesPage() {
                   key={concert.show_id}
                   concert={concert}
                   onPlayRequest={handlePlayRequest}
-                  isIndividuallyCarded={itemsInCardState.has(concert.show_id)}
-                  onToggleCardState={() => toggleItemCardState(concert.show_id)}
-                  activeVideoId={activeVideoId}
+                  // ******** THE FIX IS HERE ********
+                  // Using the correct prop names that ConcertGridRowWrapper expects.
+                  isExpanded={itemsInCardState.has(concert.show_id)}
+                  onShowSelect={() => handleShowSelect(concert.show_id)}
+                  // **********************************
                   isDesktop={isDesktop}
-                  context="festival"
                 />
             ))}
           </div>
