@@ -1,9 +1,9 @@
-// src/components/ui/FocusViewModal.tsx (Header Info Added)
+// src/components/ui/FocusViewModal.tsx
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ApiConcert, ApiConcertHeadliner, OpenerMedia } from '@/types';
-import { X, PlayCircle, Music, MapPin, Users, Ticket, Share2, CalendarPlus, DollarSign } from 'lucide-react'; // Added DollarSign
+import { X, PlayCircle, Music, MapPin, Users, Ticket, Share2, CalendarPlus, DollarSign } from 'lucide-react';
 import { loadYouTubeAPI } from '@/utils/youtubeAPILoader';
 
 interface FocusViewModalProps {
@@ -17,6 +17,7 @@ type YTPlayer = {
 };
 
 const generateCalendarLink = (show: ApiConcert) => {
+    if (!show.show_date) return '#'; 
     const artist = show.headliner;
     const title = encodeURIComponent(`${artist.name} at ${show.venue.name}`);
     const [year, month, day] = show.show_date.split('-').map(Number);
@@ -28,6 +29,7 @@ const generateCalendarLink = (show: ApiConcert) => {
 };
 
 const handleShare = async (show: ApiConcert) => {
+    if (!show.show_date) return;
     const artist = show.headliner;
     const shareData = {
         title: `${artist.name} at ${show.venue.name}`,
@@ -99,13 +101,12 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
   ? activeArtist.artist_thumbnail_url
   : undefined;
 
-  const showDateFormatted = new Date(show.show_date + 'T00:00:00').toLocaleDateString('en-US', {
+  const showDateFormatted = show.show_date ? new Date(show.show_date + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-  });
+  }) : (show as any).day_playing || '';
   
-  // --- NEW: Prepare price and age strings for the header ---
   const priceString = show.price_info?.min ? `$${show.price_info.min}` : null;
   const ageString = show.age_restriction && show.age_restriction !== 'Info TBA' ? show.age_restriction : null;
 
@@ -117,8 +118,6 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
           <h2 className="text-xl font-bold leading-tight">{show.headliner.name}</h2>
           <p className="text-base text-neutral-400 leading-tight">{show.venue.name}</p>
           <p className="text-sm text-indigo-400 mt-1">{showDateFormatted}</p>
-
-          {/* --- THIS IS THE NEW LINE FOR PRICE & AGE --- */}
           {(priceString || ageString) && (
             <div className="flex items-center gap-4 mt-2 text-sm font-semibold text-neutral-300">
                 {priceString && (
@@ -135,8 +134,6 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
         </button>
       </header>
       
-      {/* ... The rest of the component remains unchanged ... */}
-
       <div className="flex-grow overflow-y-auto">
         <div className="flex-shrink-0 relative w-full aspect-video bg-black">
           <div id={playerContainerId} className="w-full h-full" />
@@ -191,31 +188,42 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
                 </div>
               </div>
             )}
-            {/* Age restriction info is now in the header, can be removed from here if desired */}
           </div>
         </div>
       </div>
       
+      {/* --- THIS IS THE FIXED FOOTER --- */}
       <footer className="flex-shrink-0 p-3 bg-neutral-950 border-t border-neutral-800">
         <div className="grid grid-cols-3 gap-2 text-center">
-            <a href={generateCalendarLink(show)} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-neutral-800">
-                <CalendarPlus size={20} />
-                <span className="text-xs mt-1">Add to Cal</span>
-            </a>
-            <button onClick={() => handleShare(show)} className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-neutral-800">
-                <Share2 size={20} />
-                <span className="text-xs mt-1">Share</span>
-            </button>
+            {/* Show Cal/Share for regular shows, or nothing for festivals */}
+            {show.show_date ? (
+              <>
+                <a href={generateCalendarLink(show)} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-neutral-800">
+                    <CalendarPlus size={20} />
+                    <span className="text-xs mt-1">Add to Cal</span>
+                </a>
+                <button onClick={() => handleShare(show)} className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-neutral-800">
+                    <Share2 size={20} />
+                    <span className="text-xs mt-1">Share</span>
+                </button>
+              </>
+            ) : (
+              // Use two empty divs as placeholders to keep the ticket button on the right
+              <>
+                <div></div>
+                <div></div>
+              </>
+            )}
+
+            {/* Show Ticket button if URL exists, or nothing */}
             {show.ticket_url ? (
                 <a href={show.ticket_url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500">
                     <Ticket size={20} />
                     <span className="text-xs font-semibold mt-1">Get Tickets</span>
                 </a>
             ) : (
-                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-neutral-800 text-neutral-500">
-                    <Ticket size={20} />
-                    <span className="text-xs font-semibold mt-1">No Link</span>
-                </div>
+                // If no ticket URL, this grid cell will be empty, which is fine.
+                <div></div>
             )}
         </div>
       </footer>

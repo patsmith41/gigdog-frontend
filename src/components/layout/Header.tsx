@@ -12,25 +12,24 @@ const Header = () => {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  // --- MODIFIED: Added 'Venues' link ---
   const navLinks = [
-    //{ href: '/features', label: 'Features' },
-    //{ href: '/festivals/shaky-knees-2025', label: 'SHAKY KNEES' },
+    { href: '/venues', label: 'Venues' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
 
   const renderLink = (link: { href: string; label: string }) => {
-    const isActive = (link.href === '/' && pathname === '/') || (link.href !== '/' && pathname.startsWith(link.href));
+    const isActive = pathname.startsWith(link.href);
     return (
       <Link
         key={link.href}
         href={link.href}
         onClick={closeMobileMenu}
-        // --- THIS IS THE LINE TO CHANGE ---
         className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
           isActive
             ? 'bg-neutral-800 text-white'
-            : 'text-white hover:bg-neutral-800' // Changed from text-neutral-400 to text-white
+            : 'text-white hover:bg-neutral-800'
         }`}
         aria-current={isActive ? 'page' : undefined}
       >
@@ -52,16 +51,33 @@ const Header = () => {
 
           <div className="hidden md:flex items-center space-x-6">
             <nav className="flex items-center space-x-2">
-              {navLinks.map(renderLink)}
+              <Link
+                href="/festivals/shaky-knees-2025"
+                className="px-4 py-2 bg-white text-black text-base font-semibold rounded-md hover:bg-neutral-300 transition-colors"
+              >
+                Shaky Knees Guide
+              </Link>
+              {navLinks.map((link) => {
+                const isActive = pathname.startsWith(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                      isActive ? 'bg-neutral-800 text-white' : 'text-white hover:bg-neutral-800'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
-            {/* --- ALSO CHANGE THE ICON COLOR HERE --- */}
             <a href="https://instagram.com/gigdog_atl/" target="_blank" rel="noopener noreferrer" aria-label="GigDog on Instagram" className="p-2 text-white hover:text-neutral-300">
               <Instagram size={24} />
             </a>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            {/* And here for mobile */}
             <a href="https://instagram.com/gigdog_atl/" target="_blank" rel="noopener noreferrer" aria-label="GigDog on Instagram" className="p-2 rounded-md text-white hover:text-neutral-300 hover:bg-neutral-800">
               <Instagram size={24} />
             </a>
@@ -75,12 +91,20 @@ const Header = () => {
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
+
         </div>
       </div>
 
       {isMobileMenuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-neutral-800">
+            <Link
+              href="/festivals/shaky-knees-2025"
+              onClick={closeMobileMenu}
+              className="block w-full text-left px-3 py-2 mb-2 bg-white text-black text-base font-semibold rounded-md hover:bg-neutral-300 transition-colors"
+            >
+              Shaky Knees Guide
+            </Link>
             {navLinks.map(renderLink)}
           </div>
         </div>

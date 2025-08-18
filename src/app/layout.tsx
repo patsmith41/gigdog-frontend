@@ -23,6 +23,7 @@ export default function RootLayout({
           bg-background text-foreground font-sans leading-relaxed {/* <--- ADD leading-normal OR leading-relaxed */}
           flex flex-col min-h-screen 
           selection:bg-indigo-500 selection:text-white
+          overflow-x-hidden
         `}
       >{/* NO SPACE OR NEWLINE AFTER THIS > */}
         <Header />
