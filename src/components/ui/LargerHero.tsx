@@ -2,40 +2,35 @@
 'use client';
 
 import React from 'react';
-// REMOVED: No longer need to import Music2 since we are removing it.
-// import { Music2 } from 'lucide-react';
 
 const LargerHero: React.FC = () => {
-  const heroBackgroundImageUrl = '/images/gigdog-hero-main44.jpg'; 
+  const heroImageUrl = '/images/gigdog-hero-main44.jpg'; // The image with the crowd background
 
   return (
-    <section 
-      className="w-full py-12 md:py-40 bg-neutral-900 text-center relative overflow-hidden bg-cover mb-8 md:mb-12"
-      style={{ 
-        backgroundImage: `url(${heroBackgroundImageUrl})`,
-        backgroundPosition: 'center 49%', 
-      }}
-    >
-    
-
-      {/* This div keeps your content on top of the overlay */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* --- SECTION CHANGED --- */}
-        {/* The entire containing div for the logo has been removed. */}
-        {/* The title now stands on its own. */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
-          
-        </h1>
-        {/* --- END OF SECTION CHANGE --- */}
-
-
-        {/* Main Value Prop - Simplified and focused */}
-        <h2 className="text-xl md:text-4xl lg:text-3xl font-bold text-white tracking-wide">
-        </h2>
-      
-  
-        
+    // This outer section simply adds some vertical spacing around the banner.
+    <section className="w-full py-8 px-4">
+      {/* 
+        This single div IS the hero banner.
+        It is simple and directly controls all properties.
+      */}
+      <div
+        className="
+          w-full           
+          max-w-7xl        
+          mx-auto          
+          aspect-[5/1]     
+          bg-cover         
+          bg-center        
+          rounded-lg       
+          shadow-xl        
+        "
+        style={{ 
+          backgroundImage: `url(${heroImageUrl})`
+        }}
+        role="img"
+        aria-label="A crowd at a concert with the Gig Dog logo."
+      >
+        {/* This div is intentionally left empty. The background image is the content. */}
       </div>
     </section>
   );
