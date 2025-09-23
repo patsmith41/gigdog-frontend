@@ -16,7 +16,7 @@ const AboutPage = () => {
         {/* Header Section */}
         <header className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter text-white">
-            For Music Fans and Musicians By Music Fans and Musicians
+            Discover Live Music
           </h1>
           <p className="mt-4 text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto">
             Gig Dog is a modern, curated concert discovery platform built on a simple idea: how can we help connect future fans to the shows that are happening right now.
@@ -27,8 +27,7 @@ const AboutPage = () => {
         <section className="prose prose-invert prose-lg max-w-none text-neutral-300 leading-relaxed space-y-6">
           <h2 className="text-3xl font-bold text-white">Our Mission</h2>
           <p>
-            We got tired of generic, ad-cluttered event sites that lack soul. They don't know the local scene. Gig Dog's mission is to be your trusted guide to live shows in your city, starting with our hometown of Atlanta, GA.
-          </p>
+          Gig Dog Live is a hand‑curated concert calendar for Atlanta built to fix an obvious problem: generic, ad‑heavy event sites make it hard to see real shows and even harder to fall in love with someone new. Instead of starting with a playlist and hoping the tour shows up later, reverse discovery begins here—see who’s actually in town this week, tap a few previews, and walk into a room ready to become a fan. Gig Dog Live highlights indie rooms, local bands, and emerging tours so the neighborhood stages feel visible next to the big machines of ticketing and promotion.          </p>
           <p>
             Gig Dog is your concert companion. 
           </p>

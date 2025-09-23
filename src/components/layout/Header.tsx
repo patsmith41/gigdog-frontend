@@ -51,12 +51,7 @@ const Header = () => {
 
           <div className="hidden md:flex items-center space-x-6">
             <nav className="flex items-center space-x-2">
-              <Link
-                href="/festivals/shaky-knees-2025"
-                className="px-4 py-2 bg-white text-black text-base font-semibold rounded-md hover:bg-neutral-300 transition-colors"
-              >
-                Shaky Knees Guide
-              </Link>
+     
               {navLinks.map((link) => {
                 const isActive = pathname.startsWith(link.href);
                 return (
@@ -98,13 +93,7 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-neutral-800">
-            <Link
-              href="/festivals/shaky-knees-2025"
-              onClick={closeMobileMenu}
-              className="block w-full text-left px-3 py-2 mb-2 bg-white text-black text-base font-semibold rounded-md hover:bg-neutral-300 transition-colors"
-            >
-              Shaky Knees Guide
-            </Link>
+          
             {navLinks.map(renderLink)}
           </div>
         </div>

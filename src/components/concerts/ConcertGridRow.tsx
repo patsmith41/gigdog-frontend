@@ -122,20 +122,20 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onToggleExpand
                           </span>
                         </Link>
                     </div>
-                     {/* {concert.price_info?.min && (
+                      {concert.price_info?.min && (
                         <div className="hidden sm:flex items-center gap-1.5 text-xs sm:text-base font-normal text-green-400">
                             <DollarSign size={14}/><span>{concert.price_info.min}</span>
                         </div>
-                    )} */}
+                    )} 
                 </div>
             )}
         </div>
         <div className="flex flex-col sm:flex-row flex-shrink-0 items-center gap-2 md:gap-3 ml-auto">
-             {/* {concert.price_info?.min && context !== 'festival' && (
+              {concert.price_info?.min && context !== 'festival' && (
                 <div className="flex sm:hidden items-center gap-1.5 text-xs font-semibold text-green-400 pr-1">
                     <span>${concert.price_info.min}</span>
                 </div>
-            )} */}
+            )} 
             {concert.ticket_url && context !== 'festival' && (
                 <a href={concert.ticket_url} target="_blank" rel="noopener noreferrer" title="Get Tickets" className={`${actionButtonBase} ${ticketButtonStyled} hidden lg:flex`} onClick={(e) => { e.stopPropagation(); trackClick({ linkType: 'ticket_url', targetUrl: concert.ticket_url || '#', sourceComponent: 'ConcertGridRow', showId: concert.show_id, artistId: concert.headliner.artist_id, venueId: concert.venue.venue_id }); }}>
                   <Ticket size={18} />
