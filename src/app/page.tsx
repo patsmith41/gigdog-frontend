@@ -8,7 +8,7 @@ import { ApiShowsResponse } from '@/types';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const ITEMS_PER_PAGE = 20;
 
-// This function runs ON THE SERVER to fetch all necessary initial data
+// This function signature is also updated for robustness
 async function fetchInitialData(searchParams: { [key: string]: string | string[] | undefined }) {
   if (!API_BASE_URL) {
     console.error("API_BASE_URL is not defined.");
@@ -26,7 +26,6 @@ async function fetchInitialData(searchParams: { [key: string]: string | string[]
   if (artistSearch) {
     showsParams.set('artistSearch', artistSearch as string);
   } else {
-    // Default to showing shows from today onwards if no search is active
     showsParams.set('startDate', new Date().toISOString().split('T')[0]);
   }
 
@@ -71,16 +70,15 @@ const Loading = () => (
     </div>
 );
 
-// This is an async Server Component that receives searchParams from the URL
-export default async function HomePage({
-  searchParams,
-}: {
+// --- THIS IS THE CRITICAL FIX ---
+// We define the props object directly and do not destructure in the signature.
+export default async function HomePage(props: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // Data is fetched ON THE SERVER before any HTML is sent to the browser
+  const { searchParams } = props; // Destructure the searchParams inside the function body
+
   const { initialShows, initialGenres, initialVenues, dailyBlurb } = await fetchInitialData(searchParams);
 
-  // Handle case where critical data (shows) fails to load
   if (!initialShows) {
     return (
         <div className="text-center text-red-400 py-40">
@@ -94,7 +92,6 @@ export default async function HomePage({
     <div className="flex flex-col">
       <div className="hidden lg:block"><LargerHero /></div>
       <Suspense fallback={<Loading />}>
-        {/* All the fetched data is passed down to the client component as props */}
         <HomePageClient 
             initialShows={initialShows}
             initialGenres={initialGenres}
