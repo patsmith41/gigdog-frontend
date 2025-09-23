@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://www.gigdog.live/sitemap.xml
+Sitemap: https://gigdog.live/sitemap.xml
