@@ -2,14 +2,14 @@
 
 import { Suspense } from 'react';
 import LargerHero from '@/components/ui/LargerHero';
-import HomePageClient from '@/components/pages/HomePageClient'; // Corrected path from your log
+import HomePageClient from '@/components/pages/HomePageClient';
 import { ApiShowsResponse } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const ITEMS_PER_PAGE = 20;
 
 // This function runs ON THE SERVER to fetch all necessary initial data
-async function fetchInitialData(searchParams: { [key: string]: string | string[] | undefined } | undefined) {
+async function fetchInitialData(searchParams: { [key: string]: string | string[] | undefined }) {
   if (!API_BASE_URL) {
     console.error("API_BASE_URL is not defined.");
     return { 
@@ -72,10 +72,10 @@ const Loading = () => (
 );
 
 // This is an async Server Component that receives searchParams from the URL
-export default async function HomePage({ 
-  searchParams 
-}: { 
-  searchParams?: { [key: string]: string | string[] | undefined } 
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // Data is fetched ON THE SERVER before any HTML is sent to the browser
   const { initialShows, initialGenres, initialVenues, dailyBlurb } = await fetchInitialData(searchParams);
