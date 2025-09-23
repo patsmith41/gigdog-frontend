@@ -1,4 +1,4 @@
-// src/app/page.tsx
+// src/components/pages/HomePageClient.tsx
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -6,18 +6,14 @@ import { useSearchParams } from 'next/navigation';
 import CuratedShelf from '@/components/concerts/CuratedShelf';
 import ConcertGridRowWrapper from '@/components/concerts/ConcertGridRowWrapper';
 import PaginationControls from '@/components/ui/PaginationControls';
+import DailyBlurb from '@/components/ui/DailyBlurb';
 import { useDebounce } from '@/hooks/useDebounce';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import RotatingPromoWidget from '@/components/ui/RotatingPromoWidget';
 import FocusViewModal from '@/components/ui/FocusViewModal';
-import { X, SlidersHorizontal, Search } from 'lucide-react'; // --- ADDED Search icon
-import {
-  ApiConcert,
-  ApiShowsResponse,
-  NowPlayingInfo,
-} from '@/types';
+import { X, SlidersHorizontal, Search } from 'lucide-react';
+import { ApiConcert, ApiShowsResponse, NowPlayingInfo } from '@/types';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, nextFriday, isFriday, addDays } from 'date-fns';
-
 
 const ITEMS_PER_PAGE = 20;
 
@@ -26,7 +22,7 @@ interface FilterValues {
   selectedGenreId: string;
   startDate: string;
   endDate: string;
-  artistSearch: string; // --- ADDED: artistSearch to filter state
+  artistSearch: string;
 }
 
 const formatDateForSidebar = (dateString?: string): string => {
@@ -97,9 +93,7 @@ const FilterBar = ({
 
   return (
     <div className="flex flex-col gap-3 bg-neutral-800/50 p-3 rounded-lg ring-1 ring-neutral-700 mb-4">
-      {/* --- DESKTOP VIEW: MODIFIED --- */}
       <div className="hidden md:flex flex-col gap-3">
-        {/* --- ADDED: Artist Search Input for Desktop --- */}
         <div className="relative">
           <input
             type="text"
@@ -110,16 +104,9 @@ const FilterBar = ({
           />
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
         </div>
-        {/* --- END: Artist Search --- */}
         <div id="filter-bar" className="flex flex-row gap-3 items-center">
           <input type="date" aria-label="Start Date" value={filters.startDate} onChange={(e) => onFilterChange('startDate', e.target.value)} className="w-full md:w-auto flex-1 px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm" />
           <input type="date" aria-label="End Date" value={filters.endDate} onChange={(e) => onFilterChange('endDate', e.target.value)} className="w-full md:w-auto flex-1 px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm" />
-          
-           {/* <select value={filters.selectedGenreId} onChange={(e) => onFilterChange('selectedGenreId', e.target.value)} className="w-full md:w-auto flex-1 px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">All Genres</option>
-            {genres.map((genre) => (<option key={genre.id} value={genre.id}>{genre.name}</option>))}
-          </select> */}
-          
           <select value={filters.selectedVenueId} onChange={(e) => onFilterChange('selectedVenueId', e.target.value)} className="w-full md:w-auto flex-1 px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">All Venues</option>
             {venues.map((venue) => (<option key={venue.id} value={venue.id}>{venue.name}</option>))}
@@ -131,13 +118,10 @@ const FilterBar = ({
         <div className="flex items-center justify-start gap-2 pt-3 border-t border-neutral-700/50">
             <button onClick={() => onSetDateRange('this_week', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Week</button>
             <button onClick={() => onSetDateRange('this_weekend', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Weekend</button>
-
             <button onClick={() => onSetDateRange('next_week', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">Next Week</button>
             <button onClick={() => onSetDateRange('this_month', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Month</button>
         </div>
       </div>
-
-      {/* --- MOBILE VIEW: MODIFIED --- */}
       <div className="md:hidden flex flex-col gap-3">
         <div className="flex items-center gap-2">
             <div className="flex-grow grid grid-cols-4 gap-2">
@@ -150,10 +134,8 @@ const FilterBar = ({
                 <SlidersHorizontal size={16} />
             </button>
         </div>
-        
         {isMobileFiltersOpen && (
             <div className="flex flex-col gap-3 pt-3 border-t border-neutral-700/50">
-                 {/* --- ADDED: Artist Search Input for Mobile --- */}
                 <div className="relative">
                     <input
                         type="text"
@@ -164,11 +146,6 @@ const FilterBar = ({
                     />
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
                 </div>
-                {/* --- END: Artist Search --- */}
-                 {/* <select value={filters.selectedGenreId} onChange={(e) => onFilterChange('selectedGenreId', e.target.value)} className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">All Genres</option>
-                    {genres.map((genre) => (<option key={genre.id} value={genre.id}>{genre.name} ({genre.artist_count})</option>))}
-                </select> */}
                 <select value={filters.selectedVenueId} onChange={(e) => onFilterChange('selectedVenueId', e.target.value)} className="w-full px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-md text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="">All Venues</option>
                     {venues.map((venue) => (<option key={venue.id} value={venue.id}>{venue.name}</option>))}
@@ -339,38 +316,45 @@ const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
 
       <div className="space-y-6">
         <RotatingPromoWidget />
-        
         <EmailSignupSection />
       </div>
     </div>
   );
 };
 
-export default function HomePage() {
+interface HomePageClientProps {
+  initialShows: ApiShowsResponse;
+  initialGenres: any[];
+  initialVenues: any[];
+  dailyBlurb: { headline: string; blurb: string; };
+}
+
+export default function HomePageClient({ initialShows, initialGenres, initialVenues, dailyBlurb }: HomePageClientProps) {
   const searchParams = useSearchParams();
-  const [showsData, setShowsData] = useState<ApiShowsResponse | null>(null);
+  
+  // State is now INITIALIZED from the props passed down by the server component
+  const [showsData, setShowsData] = useState<ApiShowsResponse | null>(initialShows);
+  const [genres, setGenres] = useState(initialGenres);
+  const [venues, setVenues] = useState(initialVenues);
+  const [isLoading, setIsLoading] = useState(false); // Default to false, data is pre-loaded
+
   const [itemsInCardState, setItemsInCardState] = useState<Set<string>>(new Set());
   const [selectedShow, setSelectedShow] = useState<ApiConcert | null>(null);
-  const [genres, setGenres] = useState<FilterGenre[]>([]);
-  const [venues, setVenues] = useState<FilterVenue[]>([]);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [nowPlayingInfo, setNowPlayingInfo] = useState<NowPlayingInfo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // --- MODIFIED: Consolidated state and removed separate artistSearch from URL params ---
   const [filters, setFilters] = useState<FilterValues>({
     selectedVenueId: '',
     selectedGenreId: '',
     startDate: '',
     endDate: '',
-    artistSearch: searchParams.get('artistSearch') || '', // Initialize from URL param if it exists
+    artistSearch: searchParams.get('artistSearch') || '',
   });
 
   const debouncedFilters = useDebounce(filters, 350);
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const handleFilterChange = useCallback((filterName: keyof FilterValues, value: string) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
@@ -403,7 +387,7 @@ export default function HomePage() {
         endDateValue = format(endOfMonth(today), 'yyyy-MM-dd');
     }
 
-    setFilters(prev => ({ // Preserve artist search when changing dates
+    setFilters(prev => ({
       ...prev,
       selectedVenueId: '',
       selectedGenreId: '',
@@ -419,7 +403,7 @@ export default function HomePage() {
       selectedGenreId: '',
       startDate: '',
       endDate: '',
-      artistSearch: '', // Clear artist search too
+      artistSearch: '',
     });
     setCurrentPage(1);
   }, []);
@@ -428,9 +412,9 @@ export default function HomePage() {
     setCurrentPage(newPage);
     setItemsInCardState(new Set());
     setSelectedShow(null);
-    const filterBar = document.getElementById('filter-bar');
-    if (filterBar) {
-      filterBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const concertListContainer = document.getElementById('concert-list-container');
+    if (concertListContainer) {
+      concertListContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -457,20 +441,7 @@ export default function HomePage() {
       setActiveVideoId(null); setNowPlayingInfo(null);
     }
   }, []);
-
-  const fetchFilterData = useCallback(async () => {
-    if (!API_BASE_URL) return;
-    try {
-      const [genresResponse, venuesResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/parent-genres`),
-        fetch(`${API_BASE_URL}/venues-ga`),
-      ]);
-      if (genresResponse.ok) setGenres(await genresResponse.json());
-      if (venuesResponse.ok) setVenues(await venuesResponse.json());
-    } catch (error) { console.error('Error fetching filter data:', error); }
-  }, [API_BASE_URL]);
   
-  // --- MODIFIED: fetchShows now uses the consolidated debouncedFilters object
   const fetchShows = useCallback(async (page: number, currentFilters: FilterValues) => {
     if (!API_BASE_URL) {
       setError("API URL is not configured.");
@@ -503,20 +474,26 @@ export default function HomePage() {
   }, [API_BASE_URL]);
 
   useEffect(() => {
-    fetchFilterData();
-  }, [fetchFilterData]);
-  
-  // --- MODIFIED: This effect now only depends on debouncedFilters and currentPage
-  useEffect(() => {
-    fetchShows(currentPage, debouncedFilters);
-  }, [currentPage, debouncedFilters, fetchShows]);
+    // This effect now ONLY runs for subsequent fetches when filters or page change.
+    // The initial data is already provided by the server.
+    const isInitialLoad = currentPage === 1 && 
+                          filters.artistSearch === (searchParams.get('artistSearch') || '') &&
+                          !filters.startDate && !filters.endDate && !filters.selectedVenueId && !filters.selectedGenreId;
+
+    if (!isInitialLoad) {
+      fetchShows(currentPage, debouncedFilters);
+    }
+  }, [currentPage, debouncedFilters, fetchShows, filters, searchParams]);
 
   let lastDate = '';
 
   return (
     <div className="flex flex-col">
-      <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12 -mt-4 md:mt-0">
+      {/* <CuratedShelf /> */}
+      <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12 mt-8 md:mt-12">
         <main className="w-full lg:flex-grow min-w-0 order-2 lg:order-1">
+          <DailyBlurb headline={dailyBlurb.headline} blurb={dailyBlurb.blurb} />
+          
           <div className="my-4">
             <FilterBar 
                 filters={filters} 
@@ -527,9 +504,16 @@ export default function HomePage() {
                 venues={venues} 
             />
           </div>
+          
           {error && (<div className="p-4 my-4 text-red-300 bg-red-900/50 rounded-md" role="alert"><p className="font-bold">Error:</p><p>{error}</p></div>)}
+          
           <div id="concert-list-container" className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden border border-neutral-700 p-1">
-            {isLoading ? (<div className="text-center py-20"><p className="text-lg text-neutral-400">Loading shows...</p></div>) : !error && showsData?.shows.length === 0 ? (<div className="text-center py-20"><p className="text-lg text-neutral-400">No shows match the current filters.</p></div>) : ((showsData?.shows || []).map((concert) => {
+            {isLoading ? (
+              <div className="text-center py-20"><p className="text-lg text-neutral-400">Loading shows...</p></div>
+            ) : !error && showsData?.shows.length === 0 ? (
+              <div className="text-center py-20"><p className="text-lg text-neutral-400">No shows match the current filters.</p></div>
+            ) : (
+              (showsData?.shows || []).map((concert) => {
                 const showDateSeparator = concert.show_date !== lastDate;
                 if (showDateSeparator) { lastDate = concert.show_date; }
                 return (
@@ -540,16 +524,20 @@ export default function HomePage() {
                 );
             }))}
           </div>
+          
           {(showsData && showsData.totalCount > ITEMS_PER_PAGE) && (<PaginationControls currentPage={currentPage} totalPages={Math.ceil(showsData.totalCount / ITEMS_PER_PAGE)} onPageChange={handlePageChange} />)}
+          
           <div className="mt-8 lg:hidden space-y-6">
             <RotatingPromoWidget />
             <EmailSignupSection />
           </div>
         </main>
+        
         <aside className="w-full lg:w-[400px] xl:w-[480px] flex-shrink-0 order-1 lg:order-2">
           {isDesktop && <RightSidebarContent activeVideoId={activeVideoId} nowPlayingInfo={nowPlayingInfo} />}
         </aside>
       </div>
+      
       {!isDesktop && selectedShow && (<FocusViewModal show={selectedShow} onClose={handleCloseModal} />)}
     </div>
   );

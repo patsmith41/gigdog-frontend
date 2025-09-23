@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
-  title: 'GigDog - Concert Discovery',
+  title: 'Concerts In Atlanta GA - Gig Dog Live',
   description: 'Find your next live show!',
 };
 
