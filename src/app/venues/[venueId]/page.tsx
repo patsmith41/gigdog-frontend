@@ -1,16 +1,16 @@
 // src/app/venues/[venueId]/page.tsx
-'use client'; // <-- ADDED: Convert this to a Client Component to use hooks and onClick
+'use client'; 
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation'; // <-- ADDED: useParams hook
+import { notFound, useParams } from 'next/navigation'; 
 import { MapPin, Globe, ParkingCircle, Utensils, Info, Users } from 'lucide-react';
-import { RichShow } from '@/types'; // <-- ADDED: Import our correct type
+import { RichShow } from '@/types'; 
 import { format } from 'date-fns';
-import { trackClick } from '@/utils/analytics'; // <-- ADDED: Import tracking utility
-import React, { useState, useEffect } from 'react'; // <-- ADDED: useState and useEffect
+import { trackClick } from '@/utils/analytics'; 
+import React, { useState, useEffect } from 'react'; 
 
-// The VenueDetails type (no changes)
+
 interface VenueDetails {
     id: string; name: string; city: string; state: string; address: string | null;
     website: string | null; description: string | null; google_place_id: string | null;
@@ -18,7 +18,7 @@ interface VenueDetails {
     capacity: number | null;
 }
 
-// The page data type (no changes)
+
 interface VenuePageData {
   venueDetails: VenueDetails;
   upcomingShows: RichShow[];
@@ -35,7 +35,7 @@ export default function VenuePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Data fetching is now done inside a useEffect hook
+    
     const getVenueData = async () => {
       if (!venueId) return;
       setLoading(true);
@@ -50,7 +50,7 @@ export default function VenuePage() {
       try {
         const res = await fetch(`${API_BASE_URL}/venues/${venueId}`);
         if (res.status === 404) {
-          notFound(); // Trigger 404 page
+          notFound();
           return;
         }
         if (!res.ok) throw new Error(`Failed to fetch venue data: ${res.statusText}`);
@@ -64,7 +64,7 @@ export default function VenuePage() {
     };
 
     getVenueData();
-  }, [venueId]); // Re-run effect if the venueId changes
+  }, [venueId]); // Re-run effect if  id changes
 
   // --- RENDER STATES ---
   if (loading) {
@@ -73,7 +73,7 @@ export default function VenuePage() {
   if (error || !data) {
     return <div className="text-center text-red-400 py-40">Error loading venue: {error || 'Data not found.'}</div>;
   }
-  // --- END RENDER STATES ---
+  // --- end states ---
 
   const { venueDetails, upcomingShows } = data;
 

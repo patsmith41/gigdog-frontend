@@ -31,14 +31,11 @@ export interface ApiConcertVenue {
   neighborhood_id?: string;
 }
 
-// --- FIX: Corrected to match the actual database schema ---
 export interface OpenerMedia {
   name: string;
-  youtube_id_1: string | null; // Restored this field
-  // videos array removed as it's not in the DB
+  youtube_id_1: string | null;
 }
 
-// --- FIX: Corrected to match the actual database schema ---
 export interface ApiConcertHeadliner {
   artist_id: string;
   name: string;
@@ -50,8 +47,12 @@ export interface ApiConcertHeadliner {
   artist_thumbnail_url: string | null;
   artist_display_image_url: string | null;
   short_bio: string | null;
-  youtube_video_id_1: string | null; // Restored this field
-  youtube_video_id_2: string | null; // Restored this field
+  youtube_video_id_1: string | null;
+  youtube_video_id_2: string | null;
+  // --- ADDED THESE NEW VIDEO FIELDS ---
+  youtube_video_id_3: string | null;
+  youtube_interview_id: string | null;
+  // ------------------------------------
   openers_string?: string | null;
   image_url?: string | null;
 }
@@ -106,6 +107,16 @@ export interface NowPlayingInfo {
   showDate?: string;
   venueName?: string;
   ticketUrl?: string | null;
+  // --- ADDED THIS OBJECT TO CARRY VIDEO DATA ---
+  videoIds?: {
+    video1?: string | null;
+    video2?: string | null;
+    live?: string | null;
+    interview?: string | null;
+  }
+  // This is a temporary holder to pass the whole object to the player
+  headliner?: ApiConcertHeadliner; 
+  // -----------------------------------------
 }
 
 export interface FestivalArtist extends ApiConcert {

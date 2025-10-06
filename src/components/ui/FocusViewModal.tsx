@@ -55,30 +55,53 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
   ];
 
   const [activeArtist, setActiveArtist] = useState<ApiConcertHeadliner | OpenerMedia>(show.headliner);
+  
+  // --- STATE 4 vid management ---
   const [player, setPlayer] = useState<YTPlayer | null>(null);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  // state control which video is active
+  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
+  
 
-  const videoId = 'youtube_video_id_1' in activeArtist ? activeArtist.youtube_video_id_1 : null;
   const playerContainerId = `yt-player-modal-${show.show_id}-${'artist_id' in activeArtist ? activeArtist.artist_id : activeArtist.name}`;
-
+  
+  // effect runs when the user switches between Headliner/Opener tabs
   useEffect(() => {
     setActiveArtist(show.headliner);
+    // if whole modal changes reset to the headliner's first video
+    setCurrentVideoId(show.headliner?.youtube_video_id_1 || null);
   }, [show]);
 
+  // effect will only when the user clicks a tab (Headliner/Opener)
   useEffect(() => {
+      // When  active artist changes, make first available video as the default
+      const initialVideoId = 
+          ('youtube_video_id_1' in activeArtist && activeArtist.youtube_video_id_1) ||
+          ('youtube_video_id_2' in activeArtist && activeArtist.youtube_video_id_2) ||
+          ('youtube_video_id_3' in activeArtist && activeArtist.youtube_video_id_3) ||
+          ('youtube_interview_id' in activeArtist && activeArtist.youtube_interview_id) ||
+          null;
+      setCurrentVideoId(initialVideoId);
+  }, [activeArtist]);
+
+
+  //  effect is now ONLY responsible for   player lifecycle
+  useEffect(() => {
+    
     if (player) player.destroy();
     setPlayer(null);
     setIsPlayerReady(false);
     setIsPlaying(false);
 
-    if (!videoId) return;
+    // If no video ID to play .. do nada
+    if (!currentVideoId) return;
 
     const createPlayer = () => {
       if (document.getElementById(playerContainerId)) {
         // @ts-ignore
         const newPlayer = new window.YT.Player(playerContainerId, {
-          videoId: videoId,
+          videoId: currentVideoId,
           attributes: { className: 'yt-iframe' },
           playerVars: { autoplay: 0, controls: 1, modestbranding: 1, rel: 0 },
           events: { 'onReady': () => { setPlayer(newPlayer); setIsPlayerReady(true); } },
@@ -86,7 +109,7 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
       }
     };
     loadYouTubeAPI(createPlayer);
-  }, [activeArtist, videoId, playerContainerId]);
+  }, [currentVideoId, playerContainerId]); //  re-runs whenever the video ID changes
 
   const handlePlay = () => {
     if (player && isPlayerReady) {
@@ -110,6 +133,13 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
   const priceString = show.price_info?.min ? `$${show.price_info.min}` : null;
   const ageString = show.age_restriction && show.age_restriction !== 'Info TBA' ? show.age_restriction : null;
 
+  // ---  PREPARE VIDEO BUTTONS ---
+  const availableVideos = [];
+  if ('youtube_video_id_1' in activeArtist && activeArtist.youtube_video_id_1) availableVideos.push({ id: activeArtist.youtube_video_id_1, label: 'OFFICIAL' });
+  if ('youtube_video_id_2' in activeArtist && activeArtist.youtube_video_id_2) availableVideos.push({ id: activeArtist.youtube_video_id_2, label: 'LIVE' });
+  if ('youtube_video_id_3' in activeArtist && activeArtist.youtube_video_id_3) availableVideos.push({ id: activeArtist.youtube_video_id_3, label: 'Live' });
+  if ('youtube_interview_id' in activeArtist && activeArtist.youtube_interview_id) availableVideos.push({ id: activeArtist.youtube_interview_id, label: 'Interview' });
+ 
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-neutral-950 text-white">
@@ -144,7 +174,7 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-neutral-900 text-neutral-500"><Music size={48} /></div>
               )}
-              {videoId && isPlayerReady && (
+              {currentVideoId && isPlayerReady && (
                 <>
                   <div className="absolute inset-0 bg-black/40"></div>
                   <button onClick={handlePlay} className="absolute z-20 text-white/80 hover:text-white hover:scale-110 transition-transform" aria-label={`Play video for ${activeArtist.name}`}>
@@ -174,6 +204,28 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
           </nav>
         )}
 
+        {/* --- NEW: Video Selector Buttons for Mobile --- */}
+        {availableVideos.length > 1 && (
+          <div className="p-3 border-b border-neutral-800 bg-neutral-900">
+            <div className="flex items-center gap-2">
+              {availableVideos.map(video => (
+                <button
+                  key={video.id}
+                  onClick={() => setCurrentVideoId(video.id)}
+                  className={`flex-1 px-2 py-2 text-xs font-semibold rounded-md transition-colors text-center ${
+                    currentVideoId === video.id
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                  }`}
+                >
+                  {video.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* --- END: Video Selector Buttons --- */}
+
         <div className="p-4 space-y-4">
           <div className="prose prose-invert text-neutral-300">
             <p>{('short_bio' in activeArtist && activeArtist.short_bio) || "No biography available."}</p>
@@ -192,10 +244,8 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
         </div>
       </div>
       
-      {/* --- THIS IS THE FIXED FOOTER --- */}
       <footer className="flex-shrink-0 p-3 bg-neutral-950 border-t border-neutral-800">
         <div className="grid grid-cols-3 gap-2 text-center">
-            {/* Show Cal/Share for regular shows, or nothing for festivals */}
             {show.show_date ? (
               <>
                 <a href={generateCalendarLink(show)} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-neutral-800">
@@ -208,21 +258,18 @@ const FocusViewModal: React.FC<FocusViewModalProps> = ({ show, onClose }) => {
                 </button>
               </>
             ) : (
-              // Use two empty divs as placeholders to keep the ticket button on the right
               <>
                 <div></div>
                 <div></div>
               </>
             )}
 
-            {/* Show Ticket button if URL exists, or nothing */}
             {show.ticket_url ? (
-                <a href={show.ticket_url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500">
-                    <Ticket size={20} />
-                    <span className="text-xs font-semibold mt-1">Get Tickets</span>
-                </a>
+                         <a href={show.ticket_url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center p-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600">
+                         <Ticket size={20} />
+                         <span className="text-xs font-semibold mt-1">Get Tickets</span>
+                     </a>
             ) : (
-                // If no ticket URL, this grid cell will be empty, which is fine.
                 <div></div>
             )}
         </div>

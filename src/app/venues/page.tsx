@@ -52,14 +52,21 @@ export default async function VenuesPage() {
         </header>
 
         {venues && venues.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          // --- 1. THE CONTAINER IS NOW RESPONSIVE ---
+          // It's a flex column (list) by default, and becomes a grid on medium screens and up.
+          <div className="flex flex-col space-y-2 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-4 md:space-y-0">
             {venues.map((venue) => (
               <Link
                 key={venue.id}
-                href={`/venues/${venue.id}`} // This links to your EXISTING [venueId] page
-                className="group flex flex-col items-center justify-center text-center p-6 bg-neutral-900 rounded-lg border border-neutral-800 hover:border-indigo-500 hover:bg-indigo-900/20 transform hover:-translate-y-1 transition-all duration-200"
+                href={`/venues/${venue.id}`}
+                // --- 2. THE LINK STYLING IS NOW RESPONSIVE ---
+                // Default: List item style (horizontal, left-aligned)
+                // md:*: Box style (vertical, centered)
+                className="group flex items-center text-left p-4 bg-neutral-900 rounded-lg border border-neutral-800 hover:bg-neutral-800 transition-colors duration-200 md:flex-col md:items-center md:justify-center md:text-center md:p-6 md:hover:border-indigo-500 md:transform md:hover:-translate-y-1"
               >
-                <Building size={32} className="text-neutral-500 group-hover:text-indigo-400 mb-3 transition-colors" />
+                {/* --- 3. THE ICON IS NOW RESPONSIVE --- */}
+                {/* It has different size and margins for mobile vs. desktop */}
+                <Building className="text-neutral-500 group-hover:text-indigo-400 transition-colors w-6 h-6 mr-4 flex-shrink-0 md:w-8 md:h-8 md:mr-0 md:mb-3" />
                 <h2 className="font-semibold text-lg text-neutral-100 group-hover:text-white leading-tight">
                   {venue.name}
                 </h2>

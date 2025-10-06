@@ -8,7 +8,7 @@ import { ApiShowsResponse } from '@/types';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const ITEMS_PER_PAGE = 20;
 
-// This function runs ON THE SERVER to fetch all necessary initial data
+
 async function fetchInitialData(searchParams: { [key: string]: string | string[] | undefined }) {
   if (!API_BASE_URL) {
     console.error("API_BASE_URL is not defined.");
@@ -26,7 +26,7 @@ async function fetchInitialData(searchParams: { [key: string]: string | string[]
   if (artistSearch) {
     showsParams.set('artistSearch', artistSearch as string);
   } else {
-    // Default to showing shows from today onwards if no search is active
+    // Default to showing shows that start from today if no current search
     showsParams.set('startDate', new Date().toISOString().split('T')[0]);
   }
 
@@ -71,13 +71,13 @@ const Loading = () => (
     </div>
 );
 
-// FIXED: Updated type annotation to indicate searchParams is a Promise
+
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // FIXED: Await the searchParams Promise
+  //  Await the searchParams Promise
   const resolvedSearchParams = await searchParams;
   
   // Data is fetched ON THE SERVER before any HTML is sent to the browser
@@ -97,7 +97,7 @@ export default async function HomePage({
     <div className="flex flex-col">
       <div className="hidden lg:block"><LargerHero /></div>
       <Suspense fallback={<Loading />}>
-        {/* All the fetched data is passed down to the client component as props */}
+        {/* All fetched data passed down to the client component as proppppps */}
         <HomePageClient 
             initialShows={initialShows}
             initialGenres={initialGenres}

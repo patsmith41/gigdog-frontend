@@ -1,5 +1,5 @@
 // src/components/concerts/ConcertGridRowWrapper.tsx
-import React, { useEffect, useRef } from 'react'; // --- CHANGE 1: Import useEffect and useRef ---
+import React, { useEffect, useRef } from 'react'; 
 import { ApiConcert, NowPlayingInfo } from '@/types';
 import ConcertGridRow from './ConcertGridRow';
 import ConcertCard from './ConcertCard';
@@ -21,26 +21,26 @@ const ConcertGridRowWrapper: React.FC<ConcertGridRowWrapperProps> = ({
   isDesktop,
   context = 'homepage',
 }) => {
-  // --- CHANGE 2: Add a ref to get a reference to our component's main div ---
+  
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // --- CHANGE 3: Add an effect that runs when the card expands ---
+  
   useEffect(() => {
-    // We only want to scroll when the card expands on desktop
+   
     if (isExpanded && isDesktop && wrapperRef.current) {
         
-        // Add a tiny delay to ensure the card has finished rendering before we scroll
+        // lil baby  delay so card has finished rendering before we scroll
         setTimeout(() => {
             wrapperRef.current?.scrollIntoView({
-                behavior: 'smooth', // Makes the scroll animated and not a sudden jump
-                block: 'nearest',   // Scrolls the minimum amount to bring the element into view
+                behavior: 'smooth', 
+                block: 'nearest',   
             });
-        }, 100); // 100ms is usually enough for the browser to paint the new content
+        }, 100); 
     }
-  }, [isExpanded, isDesktop]); // This effect re-runs only when isExpanded or isDesktop changes
+  }, [isExpanded, isDesktop]); //  effect re-runs only when isExpanded or isDesktop changes
 
   return (
-    // --- CHANGE 4: Attach the ref to the div ---
+    
     <div
       ref={wrapperRef} 
       className={`

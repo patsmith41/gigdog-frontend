@@ -1,35 +1,38 @@
-// src/components/ui/ViewToggle.tsx (Basic Placeholder)
+// src/components/ui/ViewToggle.tsx
+'use client';
+
 import React from 'react';
+import { List, Grid } from 'lucide-react';
 
 interface ViewToggleProps {
-  viewMode: 'grid' | 'cards';
-  setViewMode: (mode: 'grid' | 'cards') => void;
+  currentView: 'cards' | 'list';
+  onViewChange: (view: 'cards' | 'list') => void;
 }
 
-const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, setViewMode }) => {
+const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) => {
   return (
-    <div className="inline-flex rounded-md shadow-sm" role="group">
+    <div className="flex items-center gap-1 bg-neutral-800 rounded-lg p-1">
       <button
-        type="button"
-        onClick={() => setViewMode('grid')}
-        className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
-          viewMode === 'grid'
-            ? 'bg-black text-white dark:bg-gray-700'
-            : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+        onClick={() => onViewChange('cards')}
+        className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          currentView === 'cards'
+            ? 'bg-indigo-600 text-white'
+            : 'text-neutral-400 hover:text-white hover:bg-neutral-700'
         }`}
       >
-        Grid View
+        <Grid size={16} />
+        Cards
       </button>
       <button
-        type="button"
-        onClick={() => setViewMode('cards')}
-        className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
-          viewMode === 'cards'
-            ? 'bg-black text-white dark:bg-gray-700'
-            : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+        onClick={() => onViewChange('list')}
+        className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          currentView === 'list'
+            ? 'bg-indigo-600 text-white'
+            : 'text-neutral-400 hover:text-white hover:bg-neutral-700'
         }`}
       >
-        Card View
+        <List size={16} />
+        List
       </button>
     </div>
   );

@@ -1,8 +1,8 @@
 // src/components/pages/HomePageClient.tsx
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import CuratedShelf from '@/components/concerts/CuratedShelf';
 import ConcertGridRowWrapper from '@/components/concerts/ConcertGridRowWrapper';
 import PaginationControls from '@/components/ui/PaginationControls';
@@ -41,7 +41,6 @@ const formatDateForSidebar = (dateString?: string): string => {
     return '';
   }
 };
-
 const formatDateSeparator = (dateString: string): string => {
   if (!dateString) return '';
   try {
@@ -58,7 +57,6 @@ const formatDateSeparator = (dateString: string): string => {
     return dateString;
   }
 };
-
 interface FilterGenre {
   id: string;
   name: string;
@@ -68,7 +66,6 @@ interface FilterVenue {
   id: string;
   name: string;
 }
-
 const FilterBar = ({
   filters,
   onFilterChange,
@@ -79,18 +76,16 @@ const FilterBar = ({
 }: {
   filters: FilterValues;
   onFilterChange: (name: keyof FilterValues, value: string) => void;
-  onSetDateRange: (start: string, end: string) => void;
+  onSetDateRange: (range: string) => void;
   onClearFilters: () => void;
   genres: FilterGenre[];
   venues: FilterVenue[];
 }) => {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-
   const clearFilters = () => {
     onClearFilters();
     setIsMobileFiltersOpen(false);
   };
-
   return (
     <div className="flex flex-col gap-3 bg-neutral-800/50 p-3 rounded-lg ring-1 ring-neutral-700 mb-4">
       <div className="hidden md:flex flex-col gap-3">
@@ -116,19 +111,19 @@ const FilterBar = ({
           </button>
         </div>
         <div className="flex items-center justify-start gap-2 pt-3 border-t border-neutral-700/50">
-            <button onClick={() => onSetDateRange('this_week', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Week</button>
-            <button onClick={() => onSetDateRange('this_weekend', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Weekend</button>
-            <button onClick={() => onSetDateRange('next_week', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">Next Week</button>
-            <button onClick={() => onSetDateRange('this_month', '')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Month</button>
+            <button onClick={() => onSetDateRange('this_week')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Week</button>
+            <button onClick={() => onSetDateRange('this_weekend')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Weekend</button>
+            <button onClick={() => onSetDateRange('next_week')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">Next Week</button>
+            <button onClick={() => onSetDateRange('this_month')} className="flex-none text-sm font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-3 py-1.5 rounded-md transition-colors">This Month</button>
         </div>
       </div>
       <div className="md:hidden flex flex-col gap-3">
         <div className="flex items-center gap-2">
             <div className="flex-grow grid grid-cols-4 gap-2">
-                <button onClick={() => onSetDateRange('this_week', '')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">This Week</button>
-                <button onClick={() => onSetDateRange('this_weekend', '')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Weekend</button>
-                <button onClick={() => onSetDateRange('next_week', '')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Next Week</button>
-                <button onClick={() => onSetDateRange('this_month', '')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Month</button>
+                <button onClick={() => onSetDateRange('this_week')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">This Week</button>
+                <button onClick={() => onSetDateRange('this_weekend')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Weekend</button>
+                <button onClick={() => onSetDateRange('next_week')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Next Week</button>
+                <button onClick={() => onSetDateRange('this_month')} className="text-xs font-medium text-neutral-300 hover:text-white bg-neutral-700/50 hover:bg-neutral-700 px-2 py-2 rounded-md transition-colors">Month</button>
             </div>
             <button onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)} className={`p-2 rounded-md transition-colors ${isMobileFiltersOpen ? 'bg-indigo-600 text-white' : 'text-neutral-300 bg-neutral-700/50'}`}>
                 <SlidersHorizontal size={16} />
@@ -164,14 +159,13 @@ const FilterBar = ({
     </div>
   );
 };
-
 const EmailSignupSection = () => (
     <div className="p-5 bg-neutral-800 rounded-xl shadow-md text-center">
       <h3 className="font-semibold text-lg text-white mb-1">
-        Weekend Picks, In Your Inbox.
+        Atlanta Live Music, In Your Inbox.
       </h3>
       <p className="text-neutral-400 text-sm mb-4">
-        Get our top 3 concert picks delivered every Friday.
+        Gig Dog weekly for info on shows and local artists.
       </p>
       <form
         className="flex flex-col sm:flex-row items-center gap-2"
@@ -192,15 +186,17 @@ const EmailSignupSection = () => (
       </form>
     </div>
 );
-
 interface RightSidebarContentProps {
   activeVideoId: string | null;
   nowPlayingInfo: NowPlayingInfo | null;
+  // --- ADDED THIS PROP ---
+  handlePlayRequest: (videoId: string | null, infoForPlayer?: NowPlayingInfo) => void;
 }
-
 const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
   activeVideoId,
   nowPlayingInfo,
+  // --- ACCEPT THIS PROP ---
+  handlePlayRequest,
 }) => {
   const handleTellFriends = () => {
     if (!nowPlayingInfo) return;
@@ -228,6 +224,16 @@ const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
         .catch(() => {});
     }
   };
+  
+  
+  const availableVideos = [];
+  if (nowPlayingInfo?.videoIds) {
+    if (nowPlayingInfo.videoIds.video1) availableVideos.push({ id: nowPlayingInfo.videoIds.video1, label: 'OFFICIAL' });
+    if (nowPlayingInfo.videoIds.video2) availableVideos.push({ id: nowPlayingInfo.videoIds.video2, label: 'LIVE' });
+    if (nowPlayingInfo.videoIds.live) availableVideos.push({ id: nowPlayingInfo.videoIds.live, label: 'Live' });
+    if (nowPlayingInfo.videoIds.interview) availableVideos.push({ id: nowPlayingInfo.videoIds.interview, label: 'Interview' });
+  }
+  
 
   return (
     <div className="space-y-6 sticky top-20 md:top-24 p-1">
@@ -261,9 +267,27 @@ const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
           </div>
           )}
         </div>
-
         {activeVideoId && nowPlayingInfo && (
           <div className="p-4 border-t border-neutral-700">
+            {/* --- NEW: Video Selector Buttons --- */}
+            {availableVideos.length > 1 && (
+              <div className="flex items-center gap-2 mb-4">
+                {availableVideos.map(video => (
+                  <button
+                    key={video.id}
+                    onClick={() => handlePlayRequest(video.id, nowPlayingInfo)}
+                    className={`flex-1 px-2 py-2 text-xs font-semibold rounded-md transition-colors text-center ${
+                      activeVideoId === video.id
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                    }`}
+                  >
+                    {video.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {/* --- END: Video Selector Buttons --- */}
             <div className="space-y-4">
               <p className="text-white text-lg leading-relaxed">
                 <span className="font-semibold">{nowPlayingInfo.artistName}</span>
@@ -313,14 +337,14 @@ const RightSidebarContent: React.FC<RightSidebarContentProps> = ({
           </div>
         )}
       </div>
-
       <div className="space-y-6">
-        <RotatingPromoWidget />
+        {/*<RotatingPromoWidget />*/}
         <EmailSignupSection />
       </div>
     </div>
   );
 };
+// End of unchanged sub-components
 
 interface HomePageClientProps {
   initialShows: ApiShowsResponse;
@@ -330,38 +354,55 @@ interface HomePageClientProps {
 }
 
 export default function HomePageClient({ initialShows, initialGenres, initialVenues, dailyBlurb }: HomePageClientProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   
-  // State is now INITIALIZED from the props passed down by the server component
   const [showsData, setShowsData] = useState<ApiShowsResponse | null>(initialShows);
   const [genres, setGenres] = useState(initialGenres);
   const [venues, setVenues] = useState(initialVenues);
-  const [isLoading, setIsLoading] = useState(false); // Default to false, data is pre-loaded
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [itemsInCardState, setItemsInCardState] = useState<Set<string>>(new Set());
   const [selectedShow, setSelectedShow] = useState<ApiConcert | null>(null);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [nowPlayingInfo, setNowPlayingInfo] = useState<NowPlayingInfo | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterValues>({
-    selectedVenueId: '',
-    selectedGenreId: '',
-    startDate: '',
-    endDate: '',
+  
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const filters: FilterValues = {
+    selectedVenueId: searchParams.get('selectedVenueId') || '',
+    selectedGenreId: searchParams.get('selectedGenreId') || '',
+    startDate: searchParams.get('startDate') || '',
+    endDate: searchParams.get('endDate') || '',
     artistSearch: searchParams.get('artistSearch') || '',
-  });
-
-  const debouncedFilters = useDebounce(filters, 350);
+  };
+  
+  const isFirstRender = useRef(true);
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
-  const handleFilterChange = useCallback((filterName: keyof FilterValues, value: string) => {
-    setFilters(prev => ({ ...prev, [filterName]: value }));
-    setCurrentPage(1);
-  }, []);
+  const updateUrl = useCallback((newParams: URLSearchParams, isPagination: boolean = false) => {
+    const url = `${pathname}?${newParams.toString()}`;
+    if (isPagination) {
+      router.push(url, { scroll: false });
+    } else {
+      router.replace(url, { scroll: false });
+    }
+  }, [router, pathname]);
+
+  const handleFilterChange = (filterName: keyof FilterValues, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(filterName, value);
+    } else {
+      params.delete(filterName);
+    }
+    params.delete('page');
+    updateUrl(params);
+  };
   
-  const handleSetDateRange = useCallback((range: string, end?: string) => {
+  const handleSetDateRange = (range: string) => {
     let startDate = '';
     let endDateValue = '';
     const today = new Date();
@@ -370,16 +411,13 @@ export default function HomePageClient({ initialShows, initialGenres, initialVen
         startDate = format(startOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
         endDateValue = format(endOfWeek(today, { weekStartsOn: 1 }), 'yyyy-MM-dd');
     } else if (range === 'next_week') {
-        const startOfThisWeek = startOfWeek(today, { weekStartsOn: 1 });
-        const startOfNextWeek = addDays(startOfThisWeek, 7);
-        const endOfNextWeek = endOfWeek(startOfNextWeek, { weekStartsOn: 1 });
+        const startOfNextWeek = addDays(startOfWeek(today, { weekStartsOn: 1 }), 7);
+        endDateValue = format(endOfWeek(startOfNextWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
         startDate = format(startOfNextWeek, 'yyyy-MM-dd');
-        endDateValue = format(endOfNextWeek, 'yyyy-MM-dd');
     } else if (range === 'this_weekend') {
         let upcomingFriday = nextFriday(today);
         if (isFriday(today)) upcomingFriday = today;
-        const upcomingSunday = new Date(upcomingFriday);
-        upcomingSunday.setDate(upcomingFriday.getDate() + 2);
+        const upcomingSunday = addDays(upcomingFriday, 2);
         startDate = format(upcomingFriday, 'yyyy-MM-dd');
         endDateValue = format(upcomingSunday, 'yyyy-MM-dd');
     } else if (range === 'this_month') {
@@ -387,35 +425,31 @@ export default function HomePageClient({ initialShows, initialGenres, initialVen
         endDateValue = format(endOfMonth(today), 'yyyy-MM-dd');
     }
 
-    setFilters(prev => ({
-      ...prev,
-      selectedVenueId: '',
-      selectedGenreId: '',
-      startDate: startDate,
-      endDate: endDateValue,
-    }));
-    setCurrentPage(1);
-  }, []);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('startDate', startDate);
+    params.set('endDate', endDateValue);
+    params.delete('page');
+    updateUrl(params);
+  };
   
   const clearAllFilters = useCallback(() => {
-    setFilters({
-      selectedVenueId: '',
-      selectedGenreId: '',
-      startDate: '',
-      endDate: '',
-      artistSearch: '',
-    });
-    setCurrentPage(1);
-  }, []);
+    updateUrl(new URLSearchParams());
+  }, [updateUrl]);
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    const mainContentArea = document.getElementById('main-content-area');
+    if (mainContentArea) {
+        mainContentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    if (newPage > 1) {
+      params.set('page', String(newPage));
+    } else {
+      params.delete('page');
+    }
+    updateUrl(params, true);
     setItemsInCardState(new Set());
     setSelectedShow(null);
-    const concertListContainer = document.getElementById('concert-list-container');
-    if (concertListContainer) {
-      concertListContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   };
 
   const handleShowSelect = useCallback((concert: ApiConcert) => {
@@ -433,65 +467,65 @@ export default function HomePageClient({ initialShows, initialGenres, initialVen
 
   const handleCloseModal = () => { setSelectedShow(null); };
   
+  // --- UPDATED THIS FUNCTION ---
   const handlePlayRequest = useCallback((videoId: string | null, infoForPlayer?: NowPlayingInfo) => {
     if (videoId && infoForPlayer) {
-      setActiveVideoId(null);
-      setTimeout(() => { setActiveVideoId(videoId); setNowPlayingInfo(infoForPlayer); }, 0);
+      // Package all video IDs from the headliner object into the state
+      const allVideoIds = {
+        video1: infoForPlayer.headliner?.youtube_video_id_1,
+        video2: infoForPlayer.headliner?.youtube_video_id_2,
+        live: infoForPlayer.headliner?.youtube_video_id_3,
+        interview: infoForPlayer.headliner?.youtube_interview_id,
+      };
+
+      setActiveVideoId(null); // Quick reset to ensure iframe re-renders
+      setTimeout(() => {
+        setActiveVideoId(videoId);
+        setNowPlayingInfo({ ...infoForPlayer, videoIds: allVideoIds });
+      }, 0);
     } else {
-      setActiveVideoId(null); setNowPlayingInfo(null);
+      setActiveVideoId(null);
+      setNowPlayingInfo(null);
     }
   }, []);
+  // --- END OF UPDATE ---
   
-  const fetchShows = useCallback(async (page: number, currentFilters: FilterValues) => {
-    if (!API_BASE_URL) {
-      setError("API URL is not configured.");
-      setIsLoading(false);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
       return;
     }
-    setIsLoading(true);
-    setError(null);
-    const queryParams = new URLSearchParams({ page: page.toString(), limit: ITEMS_PER_PAGE.toString() });
-    
-    if (currentFilters.artistSearch) queryParams.set('artistSearch', currentFilters.artistSearch);
-    if (currentFilters.selectedVenueId) queryParams.set('selectedVenueId', currentFilters.selectedVenueId);
-    if (currentFilters.selectedGenreId) queryParams.set('selectedGenreId', currentFilters.selectedGenreId);
-    if (currentFilters.startDate) queryParams.set('startDate', currentFilters.startDate);
-    if (currentFilters.endDate) queryParams.set('endDate', currentFilters.endDate);
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/shows?${queryParams.toString()}`);
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.details || `HTTP error! status: ${response.status}`);
+
+    const fetchShows = async () => {
+      if (!API_BASE_URL) { setError("API URL is not configured."); return; }
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/shows?${searchParams.toString()}`);
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.details || `HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setShowsData(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
-      const data = await response.json();
-      setShowsData(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [API_BASE_URL]);
+    };
 
-  useEffect(() => {
-    // This effect now ONLY runs for subsequent fetches when filters or page change.
-    // The initial data is already provided by the server.
-    const isInitialLoad = currentPage === 1 && 
-                          filters.artistSearch === (searchParams.get('artistSearch') || '') &&
-                          !filters.startDate && !filters.endDate && !filters.selectedVenueId && !filters.selectedGenreId;
-
-    if (!isInitialLoad) {
-      fetchShows(currentPage, debouncedFilters);
-    }
-  }, [currentPage, debouncedFilters, fetchShows, filters, searchParams]);
+    fetchShows();
+  }, [searchParams, API_BASE_URL]);
 
   let lastDate = '';
 
   return (
     <div className="flex flex-col">
-      {/* <CuratedShelf /> */}
-      <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12 mt-8 md:mt-12">
-        <main className="w-full lg:flex-grow min-w-0 order-2 lg:order-1">
+      <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-6 flex flex-col lg:flex-row gap-6 xl:gap-8 pb-12">
+        <main id="main-content-area" className="w-full lg:flex-grow min-w-0 order-2 lg:order-1">
           <DailyBlurb headline={dailyBlurb.headline} blurb={dailyBlurb.blurb} />
           
           <div className="my-4">
@@ -525,7 +559,14 @@ export default function HomePageClient({ initialShows, initialGenres, initialVen
             }))}
           </div>
           
-          {(showsData && showsData.totalCount > ITEMS_PER_PAGE) && (<PaginationControls currentPage={currentPage} totalPages={Math.ceil(showsData.totalCount / ITEMS_PER_PAGE)} onPageChange={handlePageChange} />)}
+          {(showsData && showsData.totalCount > ITEMS_PER_PAGE) && (
+            <PaginationControls 
+              currentPage={currentPage} 
+              totalPages={Math.ceil(showsData.totalCount / ITEMS_PER_PAGE)} 
+              onPageChange={handlePageChange}
+              
+            />
+          )}
           
           <div className="mt-8 lg:hidden space-y-6">
             <RotatingPromoWidget />
@@ -534,7 +575,8 @@ export default function HomePageClient({ initialShows, initialGenres, initialVen
         </main>
         
         <aside className="w-full lg:w-[400px] xl:w-[480px] flex-shrink-0 order-1 lg:order-2">
-          {isDesktop && <RightSidebarContent activeVideoId={activeVideoId} nowPlayingInfo={nowPlayingInfo} />}
+            {/* --- PASS THE HANDLER FUNCTION DOWN --- */}
+            {isDesktop && <RightSidebarContent activeVideoId={activeVideoId} nowPlayingInfo={nowPlayingInfo} handlePlayRequest={handlePlayRequest} />}
         </aside>
       </div>
       
