@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Clock, MapPin, Ticket, DollarSign, Music } from
 import Link from 'next/link';
 import { trackClick } from '@/utils/analytics';
 import { format as formatDateFns } from 'date-fns';
+import Image from 'next/image';
 
 // Reusable helper component for clean, readable festival info
 const FestivalInfo = ({ stageName, startTime, endTime }: { stageName?: string | null; startTime?: string | null, endTime?: string | null }) => {
@@ -89,13 +90,19 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onToggleExpand
         </div>
       )}
       <div className="flex w-full items-center gap-3 sm:gap-4 p-2">
-        <div className="flex-shrink-0 w-22 h-22 sm:w-28 sm:h-28 lg:w-27 lg:h-27 bg-neutral-700 rounded-2xl overflow-hidden shadow-xl">
-          {imageToUse ? (
-            <img src={imageToUse} alt={`${headlinerName} thumbnail`} className="w-full h-full object-cover" width={112} height={112} loading="lazy" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-500"><Music size={32} /></div>
-          )}
-        </div>
+      <div className="flex-shrink-0 w-22 h-22 sm:w-28 sm:h-28 lg:w-27 lg:h-27 bg-neutral-700 rounded-2xl overflow-hidden shadow-xl relative">
+  {imageToUse ? (
+    <Image 
+      src={imageToUse} 
+      alt={`${headlinerName} thumbnail`} 
+      fill
+      className="object-cover"
+      sizes="(max-width: 640px) 88px, (max-width: 1024px) 112px, 108px"
+    />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center text-neutral-500"><Music size={32} /></div>
+  )}
+</div>
         <div className="flex-grow min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="min-w-0 flex-1">
                 <h2 className={`text-base sm:text-lg md:text-xl font-semibold ${primaryTextColor} leading-tight truncate`} title={headlinerName}>
@@ -116,7 +123,23 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onToggleExpand
             ) : (
                 <div className="flex-shrink-0 min-w-0 flex items-center gap-x-4 gap-y-1 mt-1 sm:mt-0">
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm" title={venueName}>
-                        <Link href={`/venues/${concert.venue.venue_id}`} className="hover:underline" onClick={(e) => { e.stopPropagation(); trackClick({ linkType: 'venue_website', targetUrl: `/venues/${concert.venue.venue_id}`, sourceComponent: 'ConcertGridRow', showId: concert.show_id, venueId: concert.venue.venue_id }); }}>
+                        <Link href={`/venues/${concert.venue.venue_id}`} className="hover:underline" onClick={(e) => { 
+    // Disable venue navigation on mobile
+    if (window.innerWidth < 768) {
+      e.preventDefault();
+      return;
+    }
+    
+    e.stopPropagation(); 
+    trackClick({ 
+      linkType: 'venue_website', 
+      targetUrl: `/venues/${concert.venue.venue_id}`, 
+      sourceComponent: 'ConcertGridRow', 
+      showId: concert.show_id, 
+      venueId: concert.venue.venue_id 
+    }); 
+  }}
+>
                           <span className={`font-normal ${secondaryTextColor} leading-tight truncate max-w-[100px] sm:max-w-[120px] lg:max-w-[150px]`} title={venueName}>
                               {venueName}
                           </span>
@@ -124,7 +147,7 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onToggleExpand
                     </div>
                       {concert.price_info?.min && (
                         <div className="hidden sm:flex items-center gap-1.5 text-xs sm:text-base font-normal text-green-400">
-                            <DollarSign size={14}/><span>{concert.price_info.min}</span>
+                            <DollarSign size={14}/><span>{concert.price_info.min.toFixed(2)}</span>
                         </div>
                     )} 
                 </div>
@@ -133,7 +156,7 @@ const ConcertGridRow: React.FC<ConcertGridRowProps> = ({ concert, onToggleExpand
         <div className="flex flex-col sm:flex-row flex-shrink-0 items-center gap-2 md:gap-3 ml-auto">
               {concert.price_info?.min && context !== 'festival' && (
                 <div className="flex sm:hidden items-center gap-1.5 text-xs font-semibold text-green-400 pr-1">
-                    <span>${concert.price_info.min}</span>
+                    <span>${concert.price_info.min.toFixed(2)}</span>
                 </div>
             )} 
             {concert.ticket_url && context !== 'festival' && (

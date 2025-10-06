@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ApiConcert, ApiConcertHeadliner, OpenerMedia, FestivalArtist } from '@/types';
+import { ApiConcert, ApiConcertHeadliner, OpenerMedia, FestivalArtist, NowPlayingInfo } from '@/types';
 import { 
   MapPin, Info, Ticket as TicketIcon, PlayCircleIcon, Music2, Minus,
   Share2, CalendarPlus, DollarSign, Users, Music, Instagram
@@ -10,8 +10,9 @@ import {
 import Link from 'next/link';
 import { trackClick } from '@/utils/analytics';
 import { format as formatDateFns } from 'date-fns';
+import Image from 'next/image';
 
-// --- (HELPER FUNCTIONS remain unchanged) ---
+// --- (HELPER FUNCTIONS) ---
 const formatDateForCardOverlay = (dateString: string): { dayShort: string, monthDay: string } => {
     if (!dateString) return { dayShort: "TBA", monthDay: "" };
     try {
@@ -78,7 +79,7 @@ const ArtistSocials = ({ artist, concert }: { artist: ApiConcertHeadliner | Open
 
 interface ConcertCardProps {
   concert: ApiConcert | FestivalArtist;
-  onPlayRequest?: (videoId: string | null, artistInfo?: any) => void;
+  onPlayRequest?: (videoId: string | null, artistInfo?: NowPlayingInfo) => void;
   isIndividuallyToggled?: boolean;
   onCollapse?: () => void;
   activeVideoId?: string | null;
@@ -103,7 +104,19 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
   const currentArtistVideoId = 'youtube_video_id_1' in activeArtist ? activeArtist.youtube_video_id_1 : null;
 
   const handlePlay = (videoId: string | null) => {
-    if (videoId && onPlayRequest) { onPlayRequest(videoId, { artistName: artistName, showDate: concert.show_date, venueName: concert.venue.name, showId: concert.show_id, ticketUrl: concert.ticket_url }); }
+    if (videoId && onPlayRequest) {
+        
+        // pass the entire headliner object so the parent has all video IDs
+        onPlayRequest(videoId, { 
+            artistName: artistName, 
+            showDate: concert.show_date, 
+            venueName: concert.venue.name, 
+            showId: concert.show_id, 
+            ticketUrl: concert.ticket_url,
+            headliner: concert.headliner // Pass the full headliner object
+        });
+        
+    }
   };
 
   const handleShare = async () => {};
@@ -125,16 +138,21 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
         </button>
       )}
 
-      {/* --- (Left Side: Image and Venue/Social Info - NO CHANGES HERE) --- */}
       <div className="md:w-[40%] lg:w-[45%] flex-shrink-0 flex flex-col bg-neutral-900">
         <div className="relative w-full">
-          <div className="aspect-[4/3] bg-neutral-700 w-full">
-            {displayImageSrc ? (
-              <img src={displayImageSrc} alt={`${artistName} main image`} className="w-full h-full object-cover" loading="lazy"/>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral-500"><Music2 size={48} /></div>
-            )}
-          </div>
+        <div className="aspect-[4/3] bg-neutral-700 w-full relative">
+          {displayImageSrc ? (
+            <Image 
+              src={displayImageSrc} 
+              alt={`${artistName} main image`} 
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-500"><Music2 size={48} /></div>
+          )}
+        </div>
           <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white z-10">
             {context === 'festival' ? (
                 <>
@@ -171,7 +189,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
                     {concert.venue.neighborhood_name && <div className="text-xs text-neutral-400 leading-tight truncate">{concert.venue.neighborhood_name}</div>}
                   </div>
                 </div>
-                {/* --- THIS IS THE CHANGE --- */}
                 <div className="flex items-center flex-shrink-0">
                   <DollarSign size={15} className="mr-1.5 text-neutral-400" />
                   <span className="text-neutral-300 font-medium">
@@ -199,7 +216,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
                     )}
                   </span>
                 </div>
-                {/* --- END OF CHANGE --- */}
               </div>
               {concert.age_restriction && concert.age_restriction !== "Info TBA" && (
                 <div className="flex items-center"><Users size={15} className="mr-2 text-neutral-400" /> <span className="text-neutral-300">Age: {concert.age_restriction}</span></div>
@@ -208,7 +224,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
         )}
       </div>
 
-      {/* --- (Right Side: Dynamic Artist Info - NO CHANGES HERE UP TOP) --- */}
       <div className="flex-grow p-3 sm:p-4 flex flex-col md:border-l border-neutral-700">
         {allArtists.length > 1 && (
             <div className="flex border-b border-neutral-700 mb-4 -mx-4 -mt-3">
@@ -239,10 +254,8 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
           {shortBio}
         </p>
 
-        {/* --- THIS IS THE MODIFIED BUTTON BLOCK --- */}
         <div className={`grid ${context !== 'festival' ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1'} gap-2 mt-auto pt-3`}>
           
-          {/* --- FIX: ADD TO CAL BUTTON IS NOW CONDITIONAL --- */}
           {context !== 'festival' && (
             <a 
               href={generateCalendarLink(concert as ApiConcert)} 
@@ -261,7 +274,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
             </a>
           )}
           
-          {/* --- SHARE BUTTON (already conditional) --- */}
           {context !== 'festival' && (
             <button 
               onClick={() => {
@@ -280,7 +292,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
             </button>
           )}
           
-          {/* --- SHOW INFO BUTTON (already conditional) --- */}
           {context !== 'festival' && (
             <Link 
               href={`/shows/${concert.show_id}`}
@@ -297,7 +308,6 @@ const ConcertCard: React.FC<ConcertCardProps> = ({
             </Link>
           )}
           
-          {/* --- TICKET BUTTON (renders if URL exists) --- */}
           {concert.ticket_url && (
             <a 
               href={concert.ticket_url} 
